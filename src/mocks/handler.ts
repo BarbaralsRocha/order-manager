@@ -1,13 +1,17 @@
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
+import { mockContract } from '../interfaces/IMockContract';
+import { responseProfileCustomer } from './response';
 
 export const handlers = [
-  // Intercept "GET https://example.com/user" requests...
-  http.get('https://example.com/user', () => {
-    // ...and respond to them using this JSON response.
-    return HttpResponse.json({
-      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
-      firstName: 'John',
-      lastName: 'Maverick',
-    });
-  }),
+  http.get(
+    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/profile`,
+    async () => {
+      await delay(2000);
+      return HttpResponse.json({
+        ...mockContract({
+          output: responseProfileCustomer(),
+        }),
+      });
+    },
+  ),
 ];
