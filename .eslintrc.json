@@ -4,7 +4,8 @@
     "airbnb-typescript",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:react/jsx-runtime"
   ],
   "plugins": ["react", "@typescript-eslint", "prettier", "import"],
   "parserOptions": {
@@ -16,12 +17,13 @@
     "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
     "import/extensions": [
       "error",
-      "always",
+      "ignorePackages",
       {
         "js": "never",
         "jsx": "never",
         "ts": "never",
-        "tsx": "never"
+        "tsx": "never",
+        "mjs": "never"
       }
     ],
     "import/no-extraneous-dependencies": [
@@ -33,6 +35,7 @@
       }
     ],
     "import/prefer-default-export": "off",
+    "react/react-in-jsx-scope": "off",
     "no-unused-vars": "warn",
     "no-console": "warn"
   },
