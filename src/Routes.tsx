@@ -1,13 +1,17 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import OrderManager from './pages/OrderManager';
+import OrderManagerContainer from './features/OrderManager/OrderManagerContainer';
+import DrawerContainer from './components/DrawerContainer';
 
 const RoutesOrderManager: React.FC = () => {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<OrderManager />} />
-      </Routes>
-    </HashRouter>
+    <>
+      <DrawerContainer />
+      <HashRouter>
+        <Routes>
+          <Route path="/" element={<OrderManagerContainer />} />
+        </Routes>
+      </HashRouter>
+    </>
   );
 };
 
