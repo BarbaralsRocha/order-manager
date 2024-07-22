@@ -9,7 +9,7 @@ import { INITIAL_VALUES_ORDERS } from './Order.constant';
 import type * as Yup from 'yup';
 import validationSchemaOrders from '../../Orders/validationSchemaOrders';
 import validationSchemaCustomer from '../../Customers/validationSchemaCustomer';
-import validationSchemaProduct from '../../Products/validationSchemaCustomer';
+import validationSchemaProduct from '../../Products/validationSchemaProduct';
 import OrderRegister from '../../Orders/OrderRegister';
 
 export const ColumnItems: {
