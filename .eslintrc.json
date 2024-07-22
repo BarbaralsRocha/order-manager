@@ -7,7 +7,14 @@
     "plugin:prettier/recommended",
     "plugin:react/jsx-runtime"
   ],
-  "plugins": ["react", "@typescript-eslint", "prettier", "import"],
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "prettier",
+    "import",
+    "react-hooks"
+  ],
+  "ignorePatterns": ["create-component.js"],
   "parserOptions": {
     "project": "./tsconfig.json",
     "sourceType": "module"
@@ -15,6 +22,7 @@
   "rules": {
     "prettier/prettier": ["error", { "endOfLine": "auto" }],
     "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
+    "react-hooks/exhaustive-deps": "error",
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -37,7 +45,9 @@
     "import/prefer-default-export": "off",
     "react/react-in-jsx-scope": "off",
     "no-unused-vars": "warn",
-    "no-console": "warn"
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-console": "warn",
+    "react/prop-types": "off"
   },
   "settings": {
     "react": {
