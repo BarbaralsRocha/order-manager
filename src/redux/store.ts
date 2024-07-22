@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './root.reducer';
-import { ManageOrdersApi } from './ManageOrders.api';
+import { ManageOrdersApi } from '../features/OrderManager/redux/ManageOrders.api';
 
 export const store = (preloadedState?: Partial<RootState>) =>
   configureStore({
