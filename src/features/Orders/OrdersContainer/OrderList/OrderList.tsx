@@ -1,6 +1,5 @@
 import React from 'react';
 import Filters from '../Filters';
-import { useGetOrdersQuery } from '../../redux/ManageOrders.api';
 import {
   Accordion,
   AccordionActions,
@@ -20,6 +19,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import { timeFormat } from '../../../../utils/timeFormat';
 import { dateFormat } from '../../../../utils/dateFormat';
 import OrderListSkeleton from './OrderListSkeleton';
+import { useGetOrdersQuery } from '../../redux/Orders.api';
 
 const OrderList: React.FC = () => {
   const { currentData, isLoading, error } = useGetOrdersQuery();
@@ -43,7 +43,7 @@ const OrderList: React.FC = () => {
             id={`customer-${order.id}`}
           >
             <Typography gutterBottom variant="h5" component="div">
-              {order.customer.value}
+              {order.customer.name}
               <Typography variant="body2" color="text.secondary">
                 {order.deliveryDate &&
                   `${dateFormat(new Date(order.deliveryDate))} - ${timeFormat(new Date(order.deliveryDate))}`}

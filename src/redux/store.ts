@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './root.reducer';
 import { ManageOrdersApi } from '../features/OrderManager/redux/ManageOrders.api';
+import { OrdersApi } from '../features/Orders/redux/Orders.api';
 
 export const store = (preloadedState?: Partial<RootState>) =>
   configureStore({
@@ -10,7 +11,7 @@ export const store = (preloadedState?: Partial<RootState>) =>
       getDefaultMiddleware({
         immutableCheck: false,
         serializableCheck: false,
-      }).concat(ManageOrdersApi.middleware),
+      }).concat(ManageOrdersApi.middleware, OrdersApi.middleware),
     preloadedState,
   });
 

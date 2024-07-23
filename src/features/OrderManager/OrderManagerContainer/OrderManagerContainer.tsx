@@ -8,14 +8,13 @@ import {
   ManageOrders,
 } from '../utils/constants/OrderManagerSection.constant';
 import { ManageOrdersEnum } from '../utils/enums/ManageOrders.enum';
-import Orders from '../Orders';
-import Products from '../Products';
 import { useMemo } from 'react';
-import Customers from '../Customers';
+import CustomersContainer from '../../Customers/CustomersContainer';
 import { Add } from '@mui/icons-material';
 import useDrawer from '../../../hooks/useDrawer';
 import FormFormik from '../../../components/FormFormik';
-import OrderRegister from '../Orders/OrderRegister';
+import OrdersContainer from '../../Orders/OrdersContainer';
+import ProductsContainer from '../../Products/ProductsContainer';
 
 const drawerWidth = 240;
 
@@ -27,9 +26,9 @@ const OrderManagerContainer: React.FC = () => {
 
   const sectionSelected = useMemo(
     () => ({
-      [ManageOrdersEnum.CUSTOMERS]: <Customers />,
-      [ManageOrdersEnum.ORDERS]: <Orders />,
-      [ManageOrdersEnum.PRODUCTS]: <Products />,
+      [ManageOrdersEnum.CUSTOMERS]: <CustomersContainer />,
+      [ManageOrdersEnum.ORDERS]: <OrdersContainer />,
+      [ManageOrdersEnum.PRODUCTS]: <ProductsContainer />,
     }),
     [],
   );
@@ -64,7 +63,7 @@ const OrderManagerContainer: React.FC = () => {
                       ConfigButton[currentMenuSelected].validationSchema
                     }
                   >
-                    <OrderRegister />
+                    {ConfigButton[currentMenuSelected].component}
                   </FormFormik>
                 ),
               })
