@@ -14,7 +14,7 @@
     "import",
     "react-hooks"
   ],
-  "ignorePatterns": ["create-component.js"],
+  "ignorePatterns": ["create-component.js", "jest.config.ts"],
   "parserOptions": {
     "project": "./tsconfig.json",
     "sourceType": "module"
