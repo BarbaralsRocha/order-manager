@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
 import { useCallback } from 'react';
 import { IDrawer } from '../interfaces/IDrawer';
 import { SharedActions } from '../redux/slices/SharedSlice';
+import { RootState } from '../redux/store';
 
 interface IUseDrawer {
   drawer: IDrawer;

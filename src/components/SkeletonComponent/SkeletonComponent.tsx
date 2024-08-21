@@ -6,6 +6,7 @@ interface IProps {
   height: number;
   loading: boolean;
   children: ReactNode;
+  sx?: object;
   variant?: 'rectangular' | 'text' | 'rounded' | 'circular';
 }
 
@@ -15,9 +16,17 @@ const SkeletonComponent: React.FC<IProps> = ({
   loading,
   children,
   variant = 'rounded',
+  sx,
 }) => {
   if (loading) {
-    return <Skeleton width={width} height={height} variant={variant} />;
+    return (
+      <Skeleton
+        sx={{ ...sx }}
+        width={width}
+        height={height}
+        variant={variant}
+      />
+    );
   }
   return <>{children}</>;
 };

@@ -1,8 +1,7 @@
 export interface IProduct {
   id: number | null;
   name: string | null;
-  quantity: number | null;
-  type: 'un' | 'kg' | null;
+  type: 'un' | 'kg'[];
   price: number | null;
   totalPrice: number | null;
   unitaryWeight: number | null;

@@ -10,8 +10,8 @@ import validationSchemaCustomer from '../../../Customers/CustomersContainer/vali
 
 import validationSchemaProduct from '../../../Products/ProductsContainer/validationSchemaProduct';
 import { INITIAL_VALUES_ORDERS } from '../../../Orders/utils/constants/Order.constant';
-import validationSchemaOrders from '../../../Orders/OrdersContainer/OrderRegister/validationSchemaOrders';
-import OrderRegister from '../../../Orders/OrdersContainer/OrderRegister';
+import validationSchemaOrders from '../../../Orders/components/OrderRegister/validationSchemaOrders';
+import OrderRegister from '../../../Orders/components/OrderRegister';
 
 export const ColumnItems: {
   id: OrderManagerSectionType;

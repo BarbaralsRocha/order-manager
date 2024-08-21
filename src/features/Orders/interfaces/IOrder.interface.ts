@@ -24,3 +24,10 @@ export type OrderValues = IOrder[OrderKeys];
 
 export type ProductOrderKeys = keyof IProductOrder;
 export type ProductOrderValues = IProductOrder[ProductOrderKeys];
+
+export interface IFilters {
+  customerName: string | null;
+  date: string | null;
+  time: string | null;
+  products: string[];
+}

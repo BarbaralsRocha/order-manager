@@ -1,4 +1,8 @@
-import { IOrder, IProductOrder } from '../../interfaces/IOrder.interface';
+import {
+  IFilters,
+  IOrder,
+  IProductOrder,
+} from '../../interfaces/IOrder.interface';
 import { OrderSectionType, OrderSectionValue } from '../types/Order.type';
 
 export const OrderSection: Record<OrderSectionType, OrderSectionValue> = {
@@ -24,4 +28,11 @@ export const INITIAL_VALUES_PRODUCT_ORDER: IProductOrder = {
   quantity: null,
   type: null,
   additionalInformations: null,
+};
+
+export const INITIAL_VALUES_FILTERS: IFilters = {
+  customerName: null,
+  date: null,
+  time: null,
+  products: [],
 };

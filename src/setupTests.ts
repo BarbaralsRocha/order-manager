@@ -4,3 +4,9 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';
+
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+  useDispatch: (): jest.Mock => jest.fn(),
+  useStore: (): jest.Mock => jest.fn(),
+}));

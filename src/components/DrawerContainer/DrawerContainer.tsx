@@ -28,7 +28,7 @@ const DrawerContainer: React.FC = () => {
         <Typography variant="h5" sx={{ fontWeight: 500 }}>
           {drawer.title}
         </Typography>
-        <CloseIcon sx={{ cursor: 'pointer' }} onClick={handleCloseDrawer} />
+        <CloseIcon onClick={handleCloseDrawer} />
       </Box>
       {renderComponent}
     </Drawer>

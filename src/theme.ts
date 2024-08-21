@@ -25,9 +25,10 @@ declare module '@mui/material/styles' {
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#fbc105',
+      main: '#121212',
       light: '#ffe799',
-      dark: '#e0ad00',
+      dark: '#fbc105',
+      contrastText: '#fbc105',
     },
     neutral: {
       light: {
@@ -43,10 +44,97 @@ const theme = createTheme({
         contrastText: '#121212',
       },
     },
+    success: {
+      main: '#0A9E5A',
+    },
+    error: {
+      main: '#cc3333',
+    },
   },
   spacing: 8,
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Poppins", "Helvetica", "Arial", sans-serif',
+    allVariants: {
+      color: '#121212',
+    },
+  },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'neutral.dark.contrastText',
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          '&.Mui-focused': {
+            color: 'neutral.dark.contrastText',
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+          letterSpacing: 1,
+          textTransform: 'none',
+        },
+        sizeSmall: {
+          padding: '4px 8px',
+        },
+        sizeMedium: {
+          padding: '8px 16px',
+        },
+        sizeLarge: {
+          padding: '12px 24px',
+        },
+        containedPrimary: {
+          backgroundColor: '#fbc105',
+          color: '#121212',
+          '&:hover': {
+            backgroundColor: '#ffe799',
+          },
+        },
+        containedSecondary: {
+          backgroundColor: '#fff',
+          color: '#121212',
+          borderColor: '#121212',
+          boxShadow: 'none',
+          '&:hover': {
+            backgroundColor: '#f0f0f0',
+            borderColor: '#f0f0f0',
+          },
+        },
+        outlinedPrimary: {
+          border: '2px #121212 solid',
+          color: '#121212',
+          '&:hover': {
+            borderColor: '#f0f0f0',
+            backgroundColor: '#f0f0f0',
+          },
+        },
+        outlinedSecondary: {
+          borderColor: '#00FF00',
+          color: '#00FF00',
+          '&:hover': {
+            borderColor: '#00CC00',
+            backgroundColor: 'rgba(0, 255, 0, 0.04)',
+          },
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          cursor: 'pointer',
+        },
+      },
+    },
   },
 });
 

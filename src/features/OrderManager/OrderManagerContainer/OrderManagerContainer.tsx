@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux';
 import Menu from '../components/Menu';
-import { RootState } from '../../../redux/store';
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import * as S from './OrderManagerContainer.style';
 import {
@@ -13,8 +12,9 @@ import CustomersContainer from '../../Customers/CustomersContainer';
 import { Add } from '@mui/icons-material';
 import useDrawer from '../../../hooks/useDrawer';
 import FormFormik from '../../../components/FormFormik';
-import OrdersContainer from '../../Orders/OrdersContainer';
 import ProductsContainer from '../../Products/ProductsContainer';
+import { RootState } from '../../../redux/store';
+import OrdersContainer from '../../Orders/components/OrdersContainer';
 
 const drawerWidth = 240;
 
@@ -51,6 +51,7 @@ const OrderManagerContainer: React.FC = () => {
           <Button
             startIcon={<Add />}
             variant="contained"
+            sx={{}}
             onClick={() =>
               setComponentAtDrawer({
                 title: ConfigButton[currentMenuSelected].titleRegister,
