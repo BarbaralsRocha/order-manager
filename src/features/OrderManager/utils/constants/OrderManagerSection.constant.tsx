@@ -8,7 +8,7 @@ import {
 import type * as Yup from 'yup';
 import validationSchemaCustomer from '../../../Customers/CustomersContainer/validationSchemaCustomer';
 
-import validationSchemaProduct from '../../../Products/ProductsContainer/validationSchemaProduct';
+import validationSchemaProduct from '../../../Products/components/ProductsContainer/validationSchemaProduct';
 import { INITIAL_VALUES_ORDERS } from '../../../Orders/utils/constants/Order.constant';
 import validationSchemaOrders from '../../../Orders/components/OrderRegister/validationSchemaOrders';
 import OrderRegister from '../../../Orders/components/OrderRegister';

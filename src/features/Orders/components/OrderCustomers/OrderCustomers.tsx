@@ -29,8 +29,8 @@ const OrderCustomers: React.FC<IProps> = ({
       data={currentData?.output || []}
       emptyState={
         <EmptyState
-          title="Não há nenhum produto adicionado"
-          description="Preencha os campos acima e clique no '+' para adicionar"
+          title="Não há nenhuma encomenda cadastrada"
+          description="Clique em 'Adicionar Encomenda' para realizar uma nova encomenda"
         />
       }
       isLoading={isFetching}

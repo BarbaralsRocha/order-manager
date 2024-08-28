@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React from 'react';
 import { useGetOrdersQuery } from '../../redux/Orders.api';
 import { IOrder } from '../../interfaces/IOrder.interface';
 import { ContractResponse } from '../../../../interfaces/IMockContract';

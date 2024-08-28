@@ -12,7 +12,7 @@ import CustomersContainer from '../../Customers/CustomersContainer';
 import { Add } from '@mui/icons-material';
 import useDrawer from '../../../hooks/useDrawer';
 import FormFormik from '../../../components/FormFormik';
-import ProductsContainer from '../../Products/ProductsContainer';
+import ProductsContainer from '../../Products/components/ProductsContainer';
 import { RootState } from '../../../redux/store';
 import OrdersContainer from '../../Orders/components/OrdersContainer';
 
