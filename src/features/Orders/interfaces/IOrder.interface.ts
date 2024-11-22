@@ -1,4 +1,4 @@
-import { Measurement } from '../utils/types/Order.type';
+import { Measurement } from '../../../commons/types/Measurement.type';
 
 export interface IOrder {
   id: number | null;

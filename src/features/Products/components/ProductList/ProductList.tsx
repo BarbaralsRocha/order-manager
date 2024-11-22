@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
-import * as S from './ProductList.style';
-import useDrawer from '../../../../hooks/useDrawer';
-import useModal from '../../../../hooks/useModal';
-import useSnackBar from '../../../../hooks/useSnackbar';
+import React from 'react';
 import { IProduct } from '../../utils/interfaces/IProduct';
 import { useDeleteProductMutation } from '../../redux/Products.api';
 import { TableCell } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import DeleteConfirmation from '../../../../components/DeleteConfirmation';
-import FormFormik from '../../../../components/FormFormik';
+import { formatCurrency } from '../../../../utils/formatCurrency';
+import useDrawer from '../../../../commons/hooks/useDrawer';
+import useModal from '../../../../commons/hooks/useModal';
+import FormFormik from '../../../../commons/components/FormFormik';
+import DeleteConfirmation from '../../../../commons/components/DeleteConfirmation';
+import ProductRegister from '../ProductRegister';
+import validationSchemaProducts from '../ProductRegister/validationSchemaProducts';
+import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
 
 interface IProps {
   refetch(): void;
@@ -19,59 +21,42 @@ interface IProps {
 const ProductList: React.FC<IProps> = ({ refetch, product }) => {
   const { setComponentAtDrawer } = useDrawer();
   const { handleOpenModal, handleCloseModal } = useModal();
-  const { showSnackbar } = useSnackBar();
-  const [deleteProduct, { data, isLoading, isError, isUninitialized }] =
-    useDeleteProductMutation();
+  const [deleteProduct, deleteProductMutation] = useDeleteProductMutation();
 
-  useEffect(() => {
-    if (!isUninitialized) {
-      if (isLoading) {
-        showSnackbar({ message: 'Salvando dados...', type: 'info' });
-        return;
-      }
-      if (data?.output) {
-        handleCloseModal();
-        showSnackbar({ message: 'Dados salvos!', type: 'success' });
-        refetch();
-        return;
-      } else {
-        showSnackbar({
-          message: 'Não foi possivel salvar os dados!',
-          type: 'error',
-        });
-      }
-      if (isError) {
-        showSnackbar({
-          message: 'Não foi possivel salvar os dados!',
-          type: 'error',
-        });
-        return;
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.output, isUninitialized, isError, isLoading]);
+  useAlertHandler({
+    apiResult: deleteProductMutation,
+    successMessage: 'Dados salvos!',
+    errorMessage: 'Não foi possivel salvar os dados!',
+    callback: () => {
+      handleCloseModal();
+      refetch();
+    },
+  });
 
   return (
     <>
-      <TableCell component="th" scope="row" sx={{ p: 0 }}>
+      <TableCell component="th" scope="row">
         {product.name}
       </TableCell>
-      <TableCell align="right" sx={{ p: 0 }}>
-        {product.deliveryDate && dateFormat(new Date(product.deliveryDate))}
+      <TableCell align="right">{product.type}</TableCell>
+      <TableCell align="right">{formatCurrency(product.unityPrice)}</TableCell>
+      <TableCell align="right">
+        {product.unitaryWeight?.toFixed(3) || '-'}
       </TableCell>
-      <TableCell align="right" sx={{ p: 0 }}>
-        {product.deliveryDate && timeFormat(new Date(product.deliveryDate))}
+      <TableCell align="right">{formatCurrency(product.weightPrice)}</TableCell>
+      <TableCell align="right">
+        {product.additionalInformations || '-'}
       </TableCell>
       <TableCell align="right">
         <EditIcon
           sx={{ marginRight: 2 }}
           onClick={() =>
             setComponentAtDrawer({
-              title: 'Editar Encomenda',
+              title: 'Editar Produto',
               component: (
                 <FormFormik
                   initialValues={product}
-                  validationSchema={validationSchemaproducts}
+                  validationSchema={validationSchemaProducts}
                 >
                   <ProductRegister labelButton="Editar" />
                 </FormFormik>

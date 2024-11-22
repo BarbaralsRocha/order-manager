@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import OrderCustomers from './OrderCustomers';
-import { mockContract } from '../../../../interfaces/IMockContract';
+import { mockContract } from '../../../../commons/interfaces/IMockContract';
 import { responseOrders } from '../../mocks/response';
 
 test('renders OrderCustomers', () => {

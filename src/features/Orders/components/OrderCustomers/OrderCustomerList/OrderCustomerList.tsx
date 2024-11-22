@@ -5,14 +5,14 @@ import { dateFormat } from '../../../../../utils/dateFormat';
 import { timeFormat } from '../../../../../utils/timeFormat';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import useDrawer from '../../../../../hooks/useDrawer';
-import FormFormik from '../../../../../components/FormFormik';
+import useDrawer from '../../../../../commons/hooks/useDrawer';
+import FormFormik from '../../../../../commons/components/FormFormik';
 import validationSchemaOrders from '../../OrderRegister/validationSchemaOrders';
 import OrderRegister from '../../OrderRegister';
-import useModal from '../../../../../hooks/useModal';
-import DeleteConfirmation from '../../../../../components/DeleteConfirmation';
+import useModal from '../../../../../commons/hooks/useModal';
+import DeleteConfirmation from '../../../../../commons/components/DeleteConfirmation';
 import { useDeleteOrderMutation } from '../../../redux/Orders.api';
-import useSnackBar from '../../../../../hooks/useSnackbar';
+import useSnackBar from '../../../../../commons/hooks/useSnackbar';
 
 interface IProps {
   refetch: () => void;

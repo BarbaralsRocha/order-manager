@@ -1,11 +1,11 @@
-import { Measurement } from '../../../Orders/utils/types/Order.type';
+import { Measurement } from '../../../../commons/types/Measurement.type';
 
 export interface IProduct {
   id: number | null;
   name: string | null;
-  type: Measurement[];
-  unityPrice: number | null;
-  unitaryWeight: number | null;
-  totalWeight: number | null;
+  type: Measurement | null;
+  unityPrice: number | undefined;
+  unitaryWeight: number | undefined;
+  weightPrice: number | undefined;
   additionalInformations: string | null;
 }

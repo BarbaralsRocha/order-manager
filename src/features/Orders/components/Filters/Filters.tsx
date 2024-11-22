@@ -19,7 +19,7 @@ import React, { useCallback } from 'react';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { useGetProductsListQuery } from '../../redux/Orders.api';
 import { IFilters } from '../../interfaces/IOrder.interface';
-import SkeletonComponent from '../../../../components/SkeletonComponent';
+import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';

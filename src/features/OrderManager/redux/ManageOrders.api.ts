@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from '../../../redux/baseQuery';
-import { ContractResponse } from '../../../interfaces/IMockContract';
+import { baseQuery } from '../../../commons/redux/baseQuery';
+import { ContractResponse } from '../../../commons/interfaces/IMockContract';
 import { IProfile } from '../interfaces/IProfile';
 
 const endpoint = '/order-manager/api/v1';

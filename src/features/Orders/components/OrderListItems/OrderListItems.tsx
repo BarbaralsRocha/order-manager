@@ -1,7 +1,7 @@
 import { TableCell } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Measurement } from '../../utils/types/Order.type';
+import { Measurement } from '../../../../commons/types/Measurement.type';
 
 interface IProps<T> {
   rowData: T;

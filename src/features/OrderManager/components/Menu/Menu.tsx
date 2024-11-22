@@ -12,7 +12,7 @@ import { useTheme } from '@mui/material/styles';
 import { ColumnItems } from '../../utils/constants/OrderManagerSection.constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { ManageOrdersActions } from '../../redux/slices/ManageOrders.slice';
-import { RootState } from '../../../../redux/store';
+import { RootState } from '../../../../commons/redux/store';
 
 const drawerWidth = 240;
 

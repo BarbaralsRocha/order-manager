@@ -1,8 +1,8 @@
 import React from 'react';
-import TableRender from '../../../../components/TableRender';
+import TableRender from '../../../../commons/components/TableRender';
 import { ITotalProducts } from '../../interfaces/ITotalProducts.interface';
 import { useGetTotalProductsQuery } from '../../redux/Orders.api';
-import EmptyState from '../../../../components/EmptyState';
+import EmptyState from '../../../../commons/components/EmptyState';
 import { Box, TableCell } from '@mui/material';
 
 const OrderProducts: React.FC<{ query: string }> = ({ query }) => {

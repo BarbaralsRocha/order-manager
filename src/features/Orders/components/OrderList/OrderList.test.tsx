@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import OrderList from './OrderList';
 import { responseOrders } from '../../mocks/response';
-import { mockContract } from '../../../../interfaces/IMockContract';
+import { mockContract } from '../../../../commons/interfaces/IMockContract';
 
 test('renders OrderList', () => {
   render(

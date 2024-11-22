@@ -14,19 +14,19 @@ import { timeFormat } from '../../../../utils/timeFormat';
 import { dateFormat } from '../../../../utils/dateFormat';
 import OrderListSkeleton from './OrderListSkeleton';
 import { useDeleteOrderMutation } from '../../redux/Orders.api';
-import TableRender from '../../../../components/TableRender';
+import TableRender from '../../../../commons/components/TableRender';
 import { IOrder, IProductOrder } from '../../interfaces/IOrder.interface';
-import EmptyState from '../../../../components/EmptyState';
+import EmptyState from '../../../../commons/components/EmptyState';
 import OrderListItems from '../OrderListItems';
-import useDrawer from '../../../../hooks/useDrawer';
-import FormFormik from '../../../../components/FormFormik';
+import useDrawer from '../../../../commons/hooks/useDrawer';
+import FormFormik from '../../../../commons/components/FormFormik';
 import validationSchemaOrders from '../OrderRegister/validationSchemaOrders';
 import OrderRegister from '../OrderRegister';
-import ServiceFail from '../../../../components/ServiceFail';
-import useModal from '../../../../hooks/useModal';
-import DeleteConfirmation from '../../../../components/DeleteConfirmation';
-import useSnackBar from '../../../../hooks/useSnackbar';
-import { ContractResponse } from '../../../../interfaces/IMockContract';
+import ServiceFail from '../../../../commons/components/ServiceFail';
+import useModal from '../../../../commons/hooks/useModal';
+import DeleteConfirmation from '../../../../commons/components/DeleteConfirmation';
+import useSnackBar from '../../../../commons/hooks/useSnackbar';
+import { ContractResponse } from '../../../../commons/interfaces/IMockContract';
 
 interface IProps {
   currentData: ContractResponse<IOrder[]> | undefined;

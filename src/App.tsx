@@ -4,7 +4,7 @@ import Routes from './Routes';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
-import { store } from './redux/store';
+import { store } from './commons/redux/store';
 
 const App: React.FC = () => {
   return (

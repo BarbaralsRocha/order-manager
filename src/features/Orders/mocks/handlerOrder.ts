@@ -1,5 +1,5 @@
 import { delay, http, HttpResponse } from 'msw';
-import { mockContract } from '../../../interfaces/IMockContract';
+import { mockContract } from '../../../commons/interfaces/IMockContract';
 import {
   responseCustomerList,
   responseOrders,

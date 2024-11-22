@@ -10,10 +10,10 @@ import { ManageOrdersEnum } from '../utils/enums/ManageOrders.enum';
 import { useMemo } from 'react';
 import CustomersContainer from '../../Customers/CustomersContainer';
 import { Add } from '@mui/icons-material';
-import useDrawer from '../../../hooks/useDrawer';
-import FormFormik from '../../../components/FormFormik';
+import useDrawer from '../../../commons/hooks/useDrawer';
+import FormFormik from '../../../commons/components/FormFormik';
 import ProductsContainer from '../../Products/components/ProductsContainer';
-import { RootState } from '../../../redux/store';
+import { RootState } from '../../../commons/redux/store';
 import OrdersContainer from '../../Orders/components/OrdersContainer';
 
 const drawerWidth = 240;

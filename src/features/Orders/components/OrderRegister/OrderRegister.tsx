@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import * as S from './OrderRegister.style';
-import useDrawer from '../../../../hooks/useDrawer';
+import useDrawer from '../../../../commons/hooks/useDrawer';
 import { IOrder, IProductOrder } from '../../interfaces/IOrder.interface';
 import {
   useGetCustomerListQuery,
@@ -28,14 +28,15 @@ import {
   useSendOrderMutation,
 } from '../../redux/Orders.api';
 import { INITIAL_VALUES_PRODUCT_ORDER } from '../../utils/constants/Order.constant';
-import { Measurement } from '../../utils/types/Order.type';
-import useRegister from '../../../../hooks/useRegister';
-import SkeletonComponent from '../../../../components/SkeletonComponent';
-import EmptyState from '../../../../components/EmptyState';
-import TableRender from '../../../../components/TableRender';
+import useRegister from '../../hooks/useRegister';
+import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
+import EmptyState from '../../../../commons/components/EmptyState';
+import TableRender from '../../../../commons/components/TableRender';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import OrderListItems from '../OrderListItems';
-import useSnackBar from '../../../../hooks/useSnackbar';
+import useSnackBar from '../../../../commons/hooks/useSnackbar';
+import { Measurement } from '../../../../commons/types/Measurement.type';
+import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
 
 dayjs.locale('pt-br');
 
@@ -56,8 +57,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     isError: isErrorProducts,
     refetch: refetchProducts,
   } = useGetProductsListQuery();
-  const [sendOrder, { data, isLoading, isError, isUninitialized }] =
-    useSendOrderMutation();
+  const [sendOrder, sendOrderMutation] = useSendOrderMutation();
   const { values, setFieldValue, setFieldTouched } = useFormikContext<IOrder>();
   const { handleCloseDrawer } = useDrawer();
   const { showSnackbar } = useSnackBar();
@@ -66,32 +66,12 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     INITIAL_VALUES_PRODUCT_ORDER,
   );
 
-  useEffect(() => {
-    if (!isUninitialized) {
-      if (isLoading) {
-        showSnackbar({ message: 'Salvando dados...', type: 'info' });
-        return;
-      }
-      if (data?.output) {
-        handleCloseDrawer();
-        showSnackbar({ message: 'Dados salvos!', type: 'success' });
-        return;
-      } else {
-        showSnackbar({
-          message: 'Não foi possivel salvar os dados!',
-          type: 'error',
-        });
-      }
-      if (isError) {
-        showSnackbar({
-          message: 'Não foi possivel salvar os dados!',
-          type: 'error',
-        });
-        return;
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.output, isUninitialized, isError, isLoading]);
+  useAlertHandler({
+    apiResult: sendOrderMutation,
+    successMessage: 'Dados salvos!',
+    errorMessage: 'Não foi possivel salvar os dados!',
+    callback: () => handleCloseDrawer(),
+  });
 
   const handleCustomerChange = useCallback(
     (event: SelectChangeEvent<number>) => {
@@ -373,7 +353,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             variant="contained"
             size="large"
             data-testid="register-order"
-            disabled={!isOrderComplete || isLoading}
+            disabled={!isOrderComplete || sendOrderMutation.isLoading}
             onClick={() => sendOrder(values)}
           >
             {labelButton}

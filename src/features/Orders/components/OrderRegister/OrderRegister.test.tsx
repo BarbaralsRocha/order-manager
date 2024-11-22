@@ -8,12 +8,6 @@ import {
   useGetProductsListQuery,
   useSendOrderMutation,
 } from '../../redux/Orders.api';
-import useDrawer from '../../../../hooks/useDrawer';
-import useRegister from '../../../../hooks/useRegister';
-import useSnackBar from '../../../../hooks/useSnackbar';
-import getDrawerMock from '../../utils/mockTest/getDrawerMock';
-import getRegisterMock from '../../utils/mockTest/getRegisterMock';
-import getSnackbarMock from '../../utils/mockTest/getSnackbarMock';
 import {
   responseCustomerList,
   responseOrders,
@@ -21,6 +15,12 @@ import {
 } from '../../mocks/response';
 import { changeInput, changeSelect } from '../../../../utils/functions';
 import dayjs from 'dayjs';
+import useDrawer from '../../../../commons/hooks/useDrawer';
+import useRegister from '../../hooks/useRegister';
+import useSnackBar from '../../../../commons/hooks/useSnackbar';
+import getDrawerMock from '../../../../commons/mockTest/getDrawerMock';
+import getRegisterMock from '../../../../commons/mockTest/getRegisterMock';
+import getSnackbarMock from '../../../../commons/mockTest/getSnackbarMock';
 
 interface CustomFormikProps extends FormikConfig<any> {
   onSubmit: jest.Mock<any, any>;
@@ -36,9 +36,9 @@ const mockFormikPropsWithValue: CustomFormikProps = {
   onSubmit: jest.fn(),
 };
 
-jest.mock('../../../../hooks/useDrawer', () => jest.fn());
-jest.mock('../../../../hooks/useRegister', () => jest.fn());
-jest.mock('../../../../hooks/useSnackbar', () => jest.fn());
+jest.mock('../../../../commons/hooks/useDrawer', () => jest.fn());
+jest.mock('../../../../commons/hooks/useRegister', () => jest.fn());
+jest.mock('../../../../commons/hooks/useSnackbar', () => jest.fn());
 jest.mock('../../redux/Orders.api', () => ({
   useGetCustomerListQuery: jest.fn(),
   useGetProductsListQuery: jest.fn(),

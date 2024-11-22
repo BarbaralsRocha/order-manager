@@ -1,4 +1,4 @@
-import { IOptionSelect } from '../../../interfaces/ICommon.interface';
+import { IOptionSelect } from '../../../commons/interfaces/ICommon.interface';
 import { IOrder } from '../interfaces/IOrder.interface';
 import { ITotalProducts } from '../interfaces/ITotalProducts.interface';
 

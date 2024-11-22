@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGetOrdersQuery } from '../../redux/Orders.api';
 import { IOrder } from '../../interfaces/IOrder.interface';
-import { ContractResponse } from '../../../../interfaces/IMockContract';
+import { ContractResponse } from '../../../../commons/interfaces/IMockContract';
 
 interface OrderManagerChildProps {
   currentData: ContractResponse<IOrder[]> | undefined;

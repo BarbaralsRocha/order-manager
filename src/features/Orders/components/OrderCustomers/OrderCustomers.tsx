@@ -1,7 +1,7 @@
 import React from 'react';
-import TableRender from '../../../../components/TableRender';
-import EmptyState from '../../../../components/EmptyState';
-import { ContractResponse } from '../../../../interfaces/IMockContract';
+import TableRender from '../../../../commons/components/TableRender';
+import EmptyState from '../../../../commons/components/EmptyState';
+import { ContractResponse } from '../../../../commons/interfaces/IMockContract';
 import { IOrder } from '../../interfaces/IOrder.interface';
 import OrderCustomerList from './OrderCustomerList';
 
