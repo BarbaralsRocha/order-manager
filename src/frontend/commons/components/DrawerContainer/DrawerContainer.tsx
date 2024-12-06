@@ -16,7 +16,12 @@ const DrawerContainer: React.FC = () => {
   }, [drawer.component]);
 
   return (
-    <Drawer open={drawer.isOpen} onClose={handleCloseDrawer} anchor="right">
+    <Drawer
+      sx={{ height: '100vh' }}
+      open={drawer.isOpen}
+      onClose={handleCloseDrawer}
+      anchor="right"
+    >
       <Box
         sx={{
           p: 4,

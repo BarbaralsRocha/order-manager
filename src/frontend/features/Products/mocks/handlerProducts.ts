@@ -19,6 +19,18 @@ export const handlerProducts = [
     },
   ),
 
+  http.put(
+    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/product?startDate`,
+    async () => {
+      await delay(3000);
+      return HttpResponse.json({
+        ...mockContract({
+          output: true,
+        }),
+      });
+    },
+  ),
+
   http.post(
     `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/product`,
     async () => {

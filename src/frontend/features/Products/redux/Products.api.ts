@@ -22,6 +22,16 @@ export const ProductsApi = createApi({
         body: order,
       }),
     }),
+    editProduct: builder.mutation<
+      ContractResponse<boolean>,
+      { body: IProduct; date: string }
+    >({
+      query: ({ body, date }) => ({
+        url: `${endpoint}/product?${date}`,
+        method: 'PUT',
+        body: body,
+      }),
+    }),
     deleteProduct: builder.mutation<
       ContractResponse<boolean>,
       { productId: number }
@@ -38,4 +48,5 @@ export const {
   useGetProductsQuery,
   useAddProductMutation,
   useDeleteProductMutation,
+  useEditProductMutation,
 } = ProductsApi;
