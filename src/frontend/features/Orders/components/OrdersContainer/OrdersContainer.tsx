@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Button, Tab, Tabs } from '@mui/material';
 import OrderList from '../OrderList';
 import { OrdersEnum } from '../../utils/enum/Order.enum';
 import { useMemo, useState } from 'react';
@@ -9,7 +9,7 @@ import {
   INITIAL_VALUES_FILTERS,
   OrderSection,
 } from '../../utils/constants/Order.constant';
-import objetToQueryString from '../../../../utils/queryString';
+import objetToQueryString from '../../../../../utils/queryString';
 import Filters from '../Filters';
 import OrderManager from '../OrderManager';
 import { IFilters } from '../../interfaces/IOrder.interface';
@@ -73,7 +73,15 @@ const OrdersContainer: React.FC = () => {
   );
 
   return (
-    <Box sx={{ p: 3, gap: 3, display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        p: 3,
+        gap: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={tabSelected}

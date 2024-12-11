@@ -7,3 +7,11 @@ export const BoxContainer = styled(Box)`
   border-radius: 4px;
   min-width: 600px;
 `;
+
+export const Grid = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;

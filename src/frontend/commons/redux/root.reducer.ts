@@ -4,6 +4,7 @@ import { OrdersApi } from '../../features/Orders/redux/Orders.api';
 import { ProductsApi } from '../../features/Products/redux/Products.api';
 import { ManagerOrdersReducer } from '../../features/OrderManager/redux/slices/ManageOrders.slice';
 import { SharedReducer } from './slices/SharedSlice';
+import { ProductsReducer } from '../../features/Products/redux/slices/products.slice';
 
 export default combineReducers({
   [ManageOrdersApi.reducerPath]: ManageOrdersApi.reducer,
@@ -11,4 +12,5 @@ export default combineReducers({
   [ProductsApi.reducerPath]: ProductsApi.reducer,
   ManagerOrdersReducer,
   SharedReducer,
+  ProductsReducer,
 });

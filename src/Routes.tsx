@@ -1,8 +1,8 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
-import OrderManagerContainer from './features/OrderManager/OrderManagerContainer';
-import DrawerContainer from './commons/components/DrawerContainer';
-import SnackbarContainer from './commons/components/SnackbarContainer';
-import ModalContainer from './commons/components/ModalContainer';
+import OrderManagerContainer from './frontend/features/OrderManager/OrderManagerContainer';
+import DrawerContainer from './frontend/commons/components/DrawerContainer';
+import SnackbarContainer from './frontend/commons/components/SnackbarContainer';
+import ModalContainer from './frontend/commons/components/ModalContainer';
 
 const RoutesOrderManager: React.FC = () => {
   return (

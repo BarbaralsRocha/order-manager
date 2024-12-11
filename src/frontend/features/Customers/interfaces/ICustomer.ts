@@ -1,10 +1,12 @@
 export interface ICustomer {
   id: number;
-  type: 'legalEntity' | 'individual';
   name: string;
-  address: string;
-  cnpj?: number;
-  cpf?: number;
-  phoneNumber?: number;
-  otherDocument?: number;
+  fantasyName?: string;
+  address?: string;
+  cnpj?: string;
+  phoneNumber?: string;
+  stateRegistration?: string;
+  additionalInformation?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

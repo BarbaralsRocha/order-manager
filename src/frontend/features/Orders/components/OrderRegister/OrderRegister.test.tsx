@@ -5,7 +5,6 @@ import { Formik, FormikConfig } from 'formik';
 import { INITIAL_VALUES_ORDERS } from '../../utils/constants/Order.constant';
 import {
   useGetCustomerListQuery,
-  useGetProductsListQuery,
   useSendOrderMutation,
 } from '../../redux/Orders.api';
 import {
@@ -13,7 +12,7 @@ import {
   responseOrders,
   responseProducts,
 } from '../../mocks/response';
-import { changeInput, changeSelect } from '../../../../utils/functions';
+import { changeInput, changeSelect } from '../../../../../utils/functions';
 import dayjs from 'dayjs';
 import useDrawer from '../../../../commons/hooks/useDrawer';
 import useRegister from '../../hooks/useRegister';
@@ -21,6 +20,7 @@ import useSnackBar from '../../../../commons/hooks/useSnackbar';
 import getDrawerMock from '../../../../commons/mockTest/getDrawerMock';
 import getRegisterMock from '../../../../commons/mockTest/getRegisterMock';
 import getSnackbarMock from '../../../../commons/mockTest/getSnackbarMock';
+import { useGetProductsQuery } from '../../../Products/redux/Products.api';
 
 interface CustomFormikProps extends FormikConfig<any> {
   onSubmit: jest.Mock<any, any>;
@@ -46,7 +46,7 @@ jest.mock('../../redux/Orders.api', () => ({
 }));
 
 const useGetCustomerListQueryMock = useGetCustomerListQuery as jest.Mock;
-const useGetProductsListQueryMock = useGetProductsListQuery as jest.Mock;
+const useGetProductsListQueryMock = useGetProductsQuery as jest.Mock;
 const useSendOrderMutationMock = useSendOrderMutation as jest.Mock;
 const useDrawerMock = useDrawer as jest.Mock;
 const useRegisterMock = useRegister as jest.Mock;

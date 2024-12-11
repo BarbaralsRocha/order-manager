@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { IOrder } from '../../../interfaces/IOrder.interface';
 import { TableCell } from '@mui/material';
-import { dateFormat } from '../../../../../utils/dateFormat';
-import { timeFormat } from '../../../../../utils/timeFormat';
+import { dateFormat } from '../../../../../../utils/dateFormat';
+import { timeFormat } from '../../../../../../utils/timeFormat';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import useDrawer from '../../../../../commons/hooks/useDrawer';
@@ -57,7 +57,7 @@ const OrderCustomerList: React.FC<IProps> = ({ order, refetch }) => {
   return (
     <>
       <TableCell component="th" scope="row" sx={{ p: 0 }}>
-        {order.customer.name}
+        {order.customer?.fantasyName || order.customer?.name}
       </TableCell>
       <TableCell align="right" sx={{ p: 0 }}>
         {order.deliveryDate && dateFormat(new Date(order.deliveryDate))}
@@ -86,7 +86,7 @@ const OrderCustomerList: React.FC<IProps> = ({ order, refetch }) => {
           onClick={() =>
             handleOpenModal(
               <DeleteConfirmation
-                title={`Tem certeza que deseja excluir o pedido do(a) ${order.customer.name}`}
+                title={`Tem certeza que deseja excluir o pedido do(a) ${order.customer?.name}`}
                 secondaryButton={{
                   label: 'Não excluir',
                   fn: handleCloseModal,

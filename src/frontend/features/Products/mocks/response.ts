@@ -9,7 +9,7 @@ export const responseProducts = (): IProduct[] => [
     unityPrice: 0.69,
     unitaryWeight: 0.05,
     weightPrice: 0.4,
-    additionalInformations: null,
+    additionalInformation: null,
   },
   {
     id: 1,
@@ -18,6 +18,6 @@ export const responseProducts = (): IProduct[] => [
     unityPrice: 0.69,
     unitaryWeight: undefined,
     weightPrice: undefined,
-    additionalInformations: 'teste',
+    additionalInformation: 'teste',
   },
 ];

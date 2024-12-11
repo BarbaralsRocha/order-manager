@@ -1,22 +1,29 @@
 import { Measurement } from '../../../commons/types/Measurement.type';
+import { ICustomer } from '../../Customers/interfaces/ICustomer';
+import { IProduct } from '../../Products/utils/interfaces/IProduct';
 
 export interface IOrder {
   id: number | null;
-  customer: {
-    id: number | null;
-    name: string | null;
-  };
-  deliveryDate: string | null;
-  products: IProductOrder[];
+  customerId: number | null;
+  deliveryDate?: string;
+  additionalInformation?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  orderDetails: IProductOrder[];
+  customer: ICustomer | null;
 }
 
 export interface IProductOrder {
   id: number | null;
+  orderId: number | null;
   productId: number | null;
-  name: string | null;
   quantity: number | null;
+  weight: number | null;
   type: Measurement | null;
-  additionalInformations: string | null;
+  additionalInformation: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  product: IProduct | null;
 }
 
 export type OrderKeys = keyof IOrder;

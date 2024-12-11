@@ -5,7 +5,7 @@ import { responseOrders } from '../../mocks/response';
 test('renders OrderListItems', () => {
   render(
     <OrderListItems
-      rowData={responseOrders()[0].products[0]}
+      rowData={responseOrders()[0].orderDetails[0]}
       editProduct={jest.fn()}
       deleteProduct={jest.fn()}
     />,

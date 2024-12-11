@@ -1,8 +1,8 @@
 export const formatCurrency = (value: number | null | undefined): string => {
   return value
-    ? value.toLocaleString('pt-BR', {
+    ? new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-      })
+      }).format(Number(value))
     : '-';
 };

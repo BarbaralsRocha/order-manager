@@ -7,7 +7,7 @@ import { Box, TableCell } from '@mui/material';
 
 const OrderProducts: React.FC<{ query: string }> = ({ query }) => {
   const { currentData, isFetching, isError, refetch } =
-    useGetTotalProductsQuery(query);
+    useGetTotalProductsQuery('startDate=2024-01-01&endDate=2024-01-31');
 
   return (
     <Box width="60%">
@@ -26,9 +26,9 @@ const OrderProducts: React.FC<{ query: string }> = ({ query }) => {
         renderRow={(product: ITotalProducts) => (
           <>
             <TableCell component="th" scope="row">
-              {product.productName}
+              {product.product}
             </TableCell>
-            <TableCell align="right">{product.total}</TableCell>
+            <TableCell align="right">{product.totalOrders}</TableCell>
           </>
         )}
       />

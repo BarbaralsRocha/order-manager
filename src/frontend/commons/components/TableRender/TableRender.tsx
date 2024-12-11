@@ -33,18 +33,18 @@ const TableRender = <T,>({
   isLoading,
   refetch,
 }: IProps<T>) => {
-  if (isError) {
-    return (
-      <TableContainer sx={{ height: '100%', alignItems: 'center' }}>
-        <ServiceFail refetch={() => refetch && refetch()} />
-      </TableContainer>
-    );
-  }
-
   if (isLoading) {
     return (
       <TableContainer>
         <TableRenderSkeleton rows={5} columns={5} />
+      </TableContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <TableContainer sx={{ height: '100%', alignItems: 'center' }}>
+        <ServiceFail refetch={() => refetch && refetch()} />
       </TableContainer>
     );
   }

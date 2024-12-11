@@ -23,8 +23,8 @@ import * as S from './OrderRegister.style';
 import useDrawer from '../../../../commons/hooks/useDrawer';
 import { IOrder, IProductOrder } from '../../interfaces/IOrder.interface';
 import {
+  useEditOrderMutation,
   useGetCustomerListQuery,
-  useGetProductsListQuery,
   useSendOrderMutation,
 } from '../../redux/Orders.api';
 import { INITIAL_VALUES_PRODUCT_ORDER } from '../../utils/constants/Order.constant';
@@ -37,13 +37,16 @@ import OrderListItems from '../OrderListItems';
 import useSnackBar from '../../../../commons/hooks/useSnackbar';
 import { Measurement } from '../../../../commons/types/Measurement.type';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
+import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
+import { useGetProductsQuery } from '../../../Products/redux/Products.api';
+import { MeasurementEnum } from '../../../../commons/enums/Measurement.enum';
 
 dayjs.locale('pt-br');
 
 interface IProps {
   labelButton?: 'Cadastrar' | 'Editar';
 }
-// TODO: ERROR PARA QUANDO ENVIAR A ORDEM
+
 const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   const {
     currentData: currentDataCustomer,
@@ -56,15 +59,22 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     isFetching: isLoadingProducts,
     isError: isErrorProducts,
     refetch: refetchProducts,
-  } = useGetProductsListQuery();
+  } = useGetProductsQuery();
   const [sendOrder, sendOrderMutation] = useSendOrderMutation();
+  const [editOrder, editOrderMutation] = useEditOrderMutation();
   const { values, setFieldValue, setFieldTouched } = useFormikContext<IOrder>();
   const { handleCloseDrawer } = useDrawer();
-  const { showSnackbar } = useSnackBar();
   const { insertRegister, handleRemoveRegister } = useRegister();
+  const [listCustomers, setListCustomers] = useState<
+    IOptionSelect[] | undefined
+  >([]);
+  const [listProducts, setListProducts] = useState<IOptionSelect[] | undefined>(
+    [],
+  );
   const [products, setProducts] = useState<IProductOrder>(
     INITIAL_VALUES_PRODUCT_ORDER,
   );
+  const IS_EDITING = labelButton === 'Editar';
 
   useAlertHandler({
     apiResult: sendOrderMutation,
@@ -72,6 +82,37 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     errorMessage: 'Não foi possivel salvar os dados!',
     callback: () => handleCloseDrawer(),
   });
+
+  useAlertHandler({
+    apiResult: editOrderMutation,
+    successMessage: 'Dados salvos!',
+    errorMessage: 'Não foi possivel salvar os dados!',
+    callback: () => handleCloseDrawer(),
+  });
+
+  useEffect(() => {
+    const formartList = currentDataCustomer?.output.reduce((acc, value) => {
+      const format = {
+        id: value.id,
+        value: value.fantasyName || value.name,
+      };
+      acc.push(format);
+      return acc;
+    }, [] as IOptionSelect[]);
+    setListCustomers(formartList);
+  }, [currentDataCustomer]);
+
+  useEffect(() => {
+    const formartList = currentDataProducts?.output.reduce((acc, value) => {
+      const format = {
+        id: value.id as number,
+        value: value.name as string,
+      };
+      acc.push(format);
+      return acc;
+    }, [] as IOptionSelect[]);
+    setListProducts(formartList);
+  }, [currentDataProducts]);
 
   const handleCustomerChange = useCallback(
     (event: SelectChangeEvent<number>) => {
@@ -82,7 +123,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
 
       if (selectedCustomer) {
         setFieldValue('customer.id', selectedCustomer.id);
-        setFieldValue('customer.name', selectedCustomer.value);
+        setFieldValue('customer.name', selectedCustomer.name);
       }
     },
     [currentDataCustomer?.output, setFieldValue],
@@ -98,7 +139,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
       if (selectedProduct) {
         setProducts((prev) => ({
           ...prev,
-          name: selectedProduct.value,
+          name: selectedProduct.name,
           productId: Number(selectedId),
         }));
       }
@@ -107,14 +148,18 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   );
 
   const handleInsertProduct = () => {
-    insertRegister<IProductOrder>('products', products, values.products);
+    insertRegister<IProductOrder>(
+      'orderDetails',
+      products,
+      values.orderDetails,
+    );
     setProducts(INITIAL_VALUES_PRODUCT_ORDER);
   };
 
   const disableButtonToAddProduct = useMemo(() => {
-    // eslint-disable-next-line no-unused-vars
-    const { id, additionalInformations, ...rest } = products;
-    return Object.values(rest).some((s) => !s);
+    const { productId, type, weight, quantity } = products;
+    const qtde = Boolean(weight) || Boolean(quantity);
+    return Object.values({ productId, qtde, type }).some((s) => !s);
   }, [products]);
 
   const isOrderComplete = useMemo(() => {
@@ -126,9 +171,13 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
 
     return (
       requiredFields.every((field) => field !== null && field !== undefined) &&
-      values.products.length > 0
+      values.orderDetails.length > 0
     );
   }, [values]);
+
+  const finishOrder = useCallback(() => {
+    return IS_EDITING ? editOrder(values) : sendOrder(values);
+  }, [IS_EDITING, editOrder, sendOrder, values]);
 
   return (
     <S.Container>
@@ -152,13 +201,13 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
                 variant="outlined"
                 disabled={isErrorCustomer}
                 data-testid="customer"
-                value={values.customer.id || undefined}
+                value={values.customerId || undefined}
                 label="Selecione o cliente"
                 onChange={(e) => {
                   handleCustomerChange(e);
                 }}
               >
-                {currentDataCustomer?.output.map((customer) => (
+                {listCustomers?.map((customer) => (
                   <MenuItem
                     data-testid={customer.id}
                     key={customer.id}
@@ -224,7 +273,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
                   handleProductChange(e);
                 }}
               >
-                {currentDataProducts?.output.map((product) => (
+                {listProducts?.map((product) => (
                   <MenuItem key={product.id} value={product.id}>
                     {product.value}
                   </MenuItem>
@@ -268,7 +317,11 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             onChange={(e) =>
               setProducts((prev) => ({
                 ...prev,
-                quantity: Number(e.target.value),
+                ...(prev.type === MeasurementEnum.UN
+                  ? { quantity: Number(e.target.value) }
+                  : {
+                      weight: Number(e.target.value),
+                    }),
               }))
             }
           />
@@ -277,7 +330,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             label="Comentário"
             variant="outlined"
             data-testid="additionalInformations"
-            value={products.additionalInformations || ''}
+            value={products.additionalInformation || ''}
             onChange={(e) =>
               setProducts((prev) => ({
                 ...prev,
@@ -314,7 +367,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               { label: 'Observações', position: 'right' },
               { label: '', position: 'right' },
             ]}
-            data={values.products}
+            data={values.orderDetails}
             emptyState={
               <EmptyState
                 title="Não há nenhum produto adicionado"
@@ -324,11 +377,15 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             isLoading={false}
             isError={false}
             renderRow={(rowData: IProductOrder) => (
-              <OrderListItems<IProductOrder>
+              <OrderListItems
                 editProduct={() => setProducts(rowData)}
                 deleteProduct={() => {
                   setProducts(INITIAL_VALUES_PRODUCT_ORDER);
-                  handleRemoveRegister('products', rowData, values.products);
+                  handleRemoveRegister(
+                    'products',
+                    rowData,
+                    values.orderDetails,
+                  );
                 }}
                 rowData={rowData}
               />
@@ -354,7 +411,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             size="large"
             data-testid="register-order"
             disabled={!isOrderComplete || sendOrderMutation.isLoading}
-            onClick={() => sendOrder(values)}
+            onClick={() => finishOrder()}
           >
             {labelButton}
           </Button>

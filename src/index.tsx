@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { worker } from './commons/mocks/browser';
+import { worker } from './frontend/commons/mocks/browser';
 
 const enableMocking = async () => {
-  if (process.env.REACT_APP_ENV_NAME === 'LOCAL') {
-    await worker.start();
-  }
+  // if (process.env.REACT_APP_ENV_NAME === 'LOCAL') {
+  //   await worker.start();
+  // }
 };
 
 const root = ReactDOM.createRoot(

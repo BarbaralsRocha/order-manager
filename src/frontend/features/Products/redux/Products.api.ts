@@ -3,31 +3,31 @@ import { baseQuery } from '../../../commons/redux/baseQuery';
 import { ContractResponse } from '../../../commons/interfaces/IMockContract';
 import { IProduct } from '../utils/interfaces/IProduct';
 
-const endpoint = '/order-manager/api/v1';
+const endpoint = 'api';
 
 export const ProductsApi = createApi({
   reducerPath: 'ProductsApi',
   baseQuery,
   refetchOnMountOrArgChange: true,
   endpoints: (builder) => ({
-    getProducts: builder.query<ContractResponse<IProduct[]>, string>({
+    getProducts: builder.query<ContractResponse<IProduct[]>, string | void>({
       query: (params) => ({
-        url: `${endpoint}/products/summary?${params}`,
+        url: `${endpoint}/products`,
       }),
     }),
     addProduct: builder.mutation<ContractResponse<boolean>, IProduct>({
-      query: (order: IProduct) => ({
+      query: (product: IProduct) => ({
         url: `${endpoint}/product`,
         method: 'POST',
-        body: order,
+        body: product,
       }),
     }),
     editProduct: builder.mutation<
       ContractResponse<boolean>,
-      { body: IProduct; date: string }
+      { body: IProduct }
     >({
-      query: ({ body, date }) => ({
-        url: `${endpoint}/product?${date}`,
+      query: ({ body }) => ({
+        url: `${endpoint}/product/${body.id}`,
         method: 'PUT',
         body: body,
       }),

@@ -1,34 +1,23 @@
 import { TableCell } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Measurement } from '../../../../commons/types/Measurement.type';
+import { IProductOrder } from '../../interfaces/IOrder.interface';
 
-interface IProps<T> {
-  rowData: T;
+interface IProps {
+  rowData: IProductOrder;
   editProduct?: () => void;
   deleteProduct?: () => void;
 }
 
-const OrderListItems = <
-  T extends {
-    name: string | null;
-    quantity: number | null;
-    type: Measurement | null;
-    additionalInformations: string | null;
-  },
->({
-  rowData,
-  editProduct,
-  deleteProduct,
-}: IProps<T>) => {
+const OrderListItems = ({ rowData, editProduct, deleteProduct }: IProps) => {
   return (
     <>
       <TableCell component="th" scope="row">
-        {rowData.name}
+        {rowData.product?.name}
       </TableCell>
       <TableCell align="right">{rowData.type}</TableCell>
       <TableCell align="right">{rowData.quantity}</TableCell>
-      <TableCell align="right">{rowData.additionalInformations}</TableCell>
+      <TableCell align="right">{rowData.additionalInformation}</TableCell>
       {editProduct && deleteProduct && (
         <TableCell align="right">
           {<EditIcon sx={{ marginRight: 2 }} onClick={editProduct} />}

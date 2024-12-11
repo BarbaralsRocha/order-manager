@@ -1,1 +1,1 @@
-export type Measurement = 'UN' | 'KG' | 'UN / KG';
+export type Measurement = 'UN' | 'KG' | 'UN_KG';

@@ -12,5 +12,5 @@ export const INITIAL_VALUES_PRODUCTS: IProduct = {
   unityPrice: undefined,
   unitaryWeight: undefined,
   weightPrice: undefined,
-  additionalInformations: null,
+  additionalInformation: null,
 };

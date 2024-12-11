@@ -7,5 +7,5 @@ export interface IProduct {
   unityPrice: number | undefined;
   unitaryWeight: number | undefined;
   weightPrice: number | undefined;
-  additionalInformations: string | null;
+  additionalInformation: string | null;
 }

@@ -13,21 +13,24 @@ export const OrderSection: Record<OrderSectionType, OrderSectionValue> = {
 
 export const INITIAL_VALUES_ORDERS: IOrder = {
   id: null,
-  customer: {
-    id: null,
-    name: null,
-  },
-  deliveryDate: null,
-  products: [],
+  customerId: null,
+  deliveryDate: undefined,
+  additionalInformation: null,
+  createdAt: undefined,
+  updatedAt: undefined,
+  orderDetails: [],
+  customer: null,
 };
 
 export const INITIAL_VALUES_PRODUCT_ORDER: IProductOrder = {
   id: null,
   productId: null,
-  name: null,
+  orderId: null,
+  weight: null,
   quantity: null,
   type: null,
-  additionalInformations: null,
+  additionalInformation: null,
+  product: null,
 };
 
 export const INITIAL_VALUES_FILTERS: IFilters = {

@@ -8,13 +8,9 @@ import {
   Box,
   Divider,
   Button,
-  FormControlLabel,
-  FormLabel,
-  RadioGroup,
-  Radio,
 } from '@mui/material';
 import { useFormikContext } from 'formik';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 import * as S from './ProductRegister.style';
@@ -30,14 +26,8 @@ import {
   useEditProductMutation,
 } from '../../redux/Products.api';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
-import { PeriodType } from '../../utils/types/Period.type';
-import { PeriodEnum } from '../../utils/enums/Period.enum';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { IPeriod } from '../../utils/interfaces/IPeriod';
-import objetToQueryString from '../../../../utils/queryString';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../commons/redux/store';
 dayjs.locale('pt-br');
 
 interface IProps {
@@ -49,16 +39,12 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     useFormikContext<IProduct>();
   const [addProduct, addProductMutation] = useAddProductMutation();
   const [editProduct, editProductMutation] = useEditProductMutation();
-  const [period, setPeriod] = useState<PeriodType>();
-  const [date, setDate] = useState<IPeriod>({
-    startDate: dayjs(new Date()),
-    endDate: dayjs(new Date()),
-  });
   const { handleCloseDrawer } = useDrawer();
+  const { refetchList } = useSelector(
+    (state: RootState) => state.ProductsReducer,
+  );
 
   const IS_EDITING = labelButton === 'Editar';
-
-  const IS_RANGE_PERIOD = useMemo(() => period === PeriodEnum.RANGE, [period]);
 
   const SHOW_UNITY_PRICE = useMemo(
     () =>
@@ -82,14 +68,24 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     apiResult: addProductMutation,
     successMessage: 'Dados salvos!',
     errorMessage: 'Não foi possivel salvar os dados!',
-    callback: () => handleCloseDrawer(),
+    callback: () => {
+      handleCloseDrawer();
+      if (refetchList) {
+        refetchList();
+      }
+    },
   });
 
   useAlertHandler({
     apiResult: editProductMutation,
     successMessage: 'Dados salvos!',
     errorMessage: 'Não foi possivel salvar os dados!',
-    callback: () => handleCloseDrawer(),
+    callback: () => {
+      handleCloseDrawer();
+      if (refetchList) {
+        refetchList();
+      }
+    },
   });
 
   const handleChange = (
@@ -104,48 +100,13 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     fields.forEach((field) => handleChange(field, ''));
   };
 
-  useEffect(() => {
-    if (period === PeriodEnum.ALL) {
-      setDate({
-        startDate: null,
-        endDate: dayjs(new Date()),
-      });
-    }
-  }, [period]);
-
-  const validatePeriodDate = useMemo(() => {
-    if (period === PeriodEnum.RANGE) {
-      return date.startDate != null && date.endDate != null;
-    }
-    return true;
-  }, [period, date]);
-
   const disableButton = useMemo(() => {
-    return (
-      Object.keys(errors).length > 0 ||
-      addProductMutation.isLoading ||
-      !period ||
-      !validatePeriodDate
-    );
-  }, [addProductMutation.isLoading, errors, period, validatePeriodDate]);
+    return Object.keys(errors).length > 0 || addProductMutation.isLoading;
+  }, [addProductMutation.isLoading, errors]);
 
   const saveProduct = useCallback(() => {
-    const formatedDate = {
-      startDate: date.startDate?.format('YYYY-MM-DD'),
-      endDate: date.endDate?.format('YYYY-MM-DD'),
-    };
-    const queryDate = objetToQueryString(formatedDate);
-    return IS_EDITING
-      ? editProduct({ body: values, date: queryDate })
-      : addProduct(values);
-  }, [
-    IS_EDITING,
-    addProduct,
-    date.endDate,
-    date.startDate,
-    editProduct,
-    values,
-  ]);
+    return IS_EDITING ? editProduct({ body: values }) : addProduct(values);
+  }, [IS_EDITING, addProduct, editProduct, values]);
 
   return (
     <S.Container>
@@ -218,78 +179,12 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
           <TextField
             label="Informações adicionais"
             variant="outlined"
-            data-testid="additionalInformations"
-            value={values.additionalInformations || ''}
+            data-testid="additionalInformation"
+            value={values.additionalInformation || ''}
             onChange={(e) =>
-              handleChange('additionalInformations', e.target.value)
+              handleChange('additionalInformation', e.target.value)
             }
           />
-
-          {IS_EDITING && (
-            <FormControl>
-              <FormLabel id="demo-controlled-radio-buttons-group">
-                Período
-              </FormLabel>
-              <RadioGroup
-                aria-labelledby="demo-controlled-radio-buttons-group"
-                defaultValue=""
-                name="controlled-radio-buttons-group"
-                value={period}
-                onChange={(event) =>
-                  setPeriod(
-                    (event.target as HTMLInputElement).value as PeriodType,
-                  )
-                }
-              >
-                <FormControlLabel
-                  value={PeriodEnum.ALL}
-                  control={<Radio />}
-                  label="Mudar para todos registros antigos"
-                />
-                <FormControlLabel
-                  value={PeriodEnum.RANGE}
-                  control={<Radio />}
-                  label="Mudar somente em um período específico"
-                />
-              </RadioGroup>
-            </FormControl>
-          )}
-          {IS_RANGE_PERIOD && IS_EDITING && (
-            <>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['DatePicker']}>
-                  <DatePicker
-                    label="Data início"
-                    views={['year', 'month', 'day']}
-                    format="DD/MM/YYYY"
-                    value={date.startDate ? dayjs(date.startDate) : undefined}
-                    onChange={(e) => {
-                      setDate((prev) => ({
-                        ...prev,
-                        startDate: dayjs(e),
-                      }));
-                    }}
-                  />
-                </DemoContainer>
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['DatePicker']}>
-                  <DatePicker
-                    label="Data fim"
-                    views={['year', 'month', 'day']}
-                    format="DD/MM/YYYY"
-                    value={date.endDate ? dayjs(date.endDate) : undefined}
-                    onChange={(e) =>
-                      setDate((prev) => ({
-                        ...prev,
-                        endDate: dayjs(e),
-                      }))
-                    }
-                  />
-                </DemoContainer>
-              </LocalizationProvider>
-            </>
-          )}
         </Box>
       </div>
       <div>

@@ -1,5 +1,7 @@
 export interface ITotalProducts {
-  id: number;
-  productName: string;
-  total: number;
+  product: string;
+  type: string;
+  quantity: number;
+  weight: number;
+  totalOrders: number;
 }

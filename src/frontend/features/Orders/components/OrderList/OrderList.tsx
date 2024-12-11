@@ -10,8 +10,8 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { timeFormat } from '../../../../utils/timeFormat';
-import { dateFormat } from '../../../../utils/dateFormat';
+import { timeFormat } from '../../../../../utils/timeFormat';
+import { dateFormat } from '../../../../../utils/dateFormat';
 import OrderListSkeleton from './OrderListSkeleton';
 import { useDeleteOrderMutation } from '../../redux/Orders.api';
 import TableRender from '../../../../commons/components/TableRender';
@@ -27,6 +27,7 @@ import useModal from '../../../../commons/hooks/useModal';
 import DeleteConfirmation from '../../../../commons/components/DeleteConfirmation';
 import useSnackBar from '../../../../commons/hooks/useSnackbar';
 import { ContractResponse } from '../../../../commons/interfaces/IMockContract';
+import * as S from './OrderList.style';
 
 interface IProps {
   currentData: ContractResponse<IOrder[]> | undefined;
@@ -83,6 +84,17 @@ const OrderList: React.FC<IProps> = ({
     return <OrderListSkeleton />;
   }
 
+  if (!currentData?.output.length) {
+    return (
+      <S.Grid>
+        <EmptyState
+          title="Não há nenhuma encomenda cadastrada"
+          description="Clique em 'Adicionar Encomenda' para realizar uma nova encomenda"
+        />
+      </S.Grid>
+    );
+  }
+
   return (
     <>
       {currentData?.output.map((order) => (
@@ -93,7 +105,7 @@ const OrderList: React.FC<IProps> = ({
             id={`customer-${order.id}`}
           >
             <Typography gutterBottom variant="h5" component="div">
-              {order.customer.name}
+              {order.customer?.fantasyName || order.customer?.name}
               <Typography variant="body2" color="text.secondary">
                 {order.deliveryDate &&
                   `${dateFormat(new Date(order.deliveryDate))} - ${timeFormat(new Date(order.deliveryDate))}`}
@@ -108,7 +120,7 @@ const OrderList: React.FC<IProps> = ({
                 { label: 'Quantidade', position: 'right' },
                 { label: 'Observações', position: 'right' },
               ]}
-              data={order.products}
+              data={order.orderDetails}
               emptyState={
                 <EmptyState
                   title="Não há nenhum produto adicionado"
@@ -118,7 +130,7 @@ const OrderList: React.FC<IProps> = ({
               isLoading={false}
               isError={false}
               renderRow={(rowData: IProductOrder) => (
-                <OrderListItems<IProductOrder> rowData={rowData} />
+                <OrderListItems rowData={rowData} />
               )}
             />
           </AccordionDetails>
@@ -146,7 +158,7 @@ const OrderList: React.FC<IProps> = ({
               onClick={() =>
                 handleOpenModal(
                   <DeleteConfirmation
-                    title={`Tem certeza que deseja excluir o pedido do(a) ${order.customer.name}`}
+                    title={`Tem certeza que deseja excluir o pedido do(a) ${order.customer?.name}`}
                     secondaryButton={{
                       label: 'Não excluir',
                       fn: handleCloseModal,

@@ -4,50 +4,46 @@ import { ITotalProducts } from '../interfaces/ITotalProducts.interface';
 
 export const responseOrders = (): IOrder[] => [
   {
-    id: 1,
-    customer: { id: 1, name: 'Vovo geralda' },
-    deliveryDate: '2024-07-12T11:00:00.000Z',
-    products: [
+    id: 6,
+    customerId: 2,
+    deliveryDate: '2024-12-13T03:00:00.000Z',
+    additionalInformation: null,
+    createdAt: '2024-12-09T20:53:57.831Z',
+    updatedAt: '2024-12-09T20:53:57.831Z',
+    orderDetails: [
       {
-        id: 1,
-        productId: 2,
-        name: 'Pao de doce',
-        quantity: 100,
+        id: 6,
+        orderId: 6,
+        productId: 3,
+        quantity: 200,
         type: 'UN',
-        additionalInformations: 'cortado e embalado',
-      },
-      {
-        id: 2,
-        productId: 1,
-        name: 'Pao de sal',
-        quantity: 100,
-        type: 'UN',
-        additionalInformations: 'cortado e embalado',
-      },
-    ],
-  },
-  {
-    id: 2,
-    customer: { id: 2, name: 'Murilo Rubião' },
-    deliveryDate: '2024-07-12T10:00:00.000Z',
-    products: [
-      {
-        id: 1,
-        productId: 2,
-        name: 'Pao de doce',
-        quantity: 100,
-        type: 'UN',
-        additionalInformations: 'cortado e embalado',
-      },
-      {
-        id: 2,
-        productId: 1,
-        name: 'Pao de sal',
-        quantity: 100,
-        type: 'UN',
-        additionalInformations: 'cortado e embalado',
+        weight: null,
+        additionalInformation: null,
+        updatedAt: '2024-12-09T20:53:57.831Z',
+        createdAt: '2024-12-09T20:53:57.831Z',
+        product: {
+          id: 3,
+          name: 'Pão de sal',
+          additionalInformation: null,
+          type: 'UN_KG',
+          unityPrice: 1.2,
+          unitaryWeight: 0.06,
+          weightPrice: 0.8,
+        },
       },
     ],
+    customer: {
+      id: 2,
+      name: 'Caixa Escolar da Escola Municipal Murilo Rubião',
+      fantasyName: 'Murilo Rubião',
+      additionalInformation: 'Cortado e embalado',
+      address: 'teste',
+      cnpj: '12345678000122',
+      stateRegistration: '12345678',
+      phoneNumber: '11123456789',
+      updatedAt: '2024-12-09T15:17:49.443Z',
+      createdAt: '2024-12-09T16:36:43.289Z',
+    },
   },
 ];
 
@@ -64,13 +60,10 @@ export const responseProducts = (): IOptionSelect[] => [
 
 export const responseTotalProducts = (): ITotalProducts[] => [
   {
-    id: 1,
-    productName: 'Pao de sal',
-    total: 200,
-  },
-  {
-    id: 2,
-    productName: 'Pao de doce',
-    total: 300,
+    product: 'Pao de sal',
+    type: 'UN',
+    quantity: 200,
+    weight: 0,
+    totalOrders: 1,
   },
 ];

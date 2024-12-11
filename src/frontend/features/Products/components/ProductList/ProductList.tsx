@@ -4,7 +4,7 @@ import { useDeleteProductMutation } from '../../redux/Products.api';
 import { TableCell } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { formatCurrency } from '../../../../utils/formatCurrency';
+import { formatCurrency } from '../../../../../utils/formatCurrency';
 import useDrawer from '../../../../commons/hooks/useDrawer';
 import useModal from '../../../../commons/hooks/useModal';
 import FormFormik from '../../../../commons/components/FormFormik';
@@ -40,12 +40,10 @@ const ProductList: React.FC<IProps> = ({ refetch, product }) => {
       </TableCell>
       <TableCell align="right">{product.type}</TableCell>
       <TableCell align="right">{formatCurrency(product.unityPrice)}</TableCell>
-      <TableCell align="right">
-        {product.unitaryWeight?.toFixed(3) || '-'}
-      </TableCell>
+      <TableCell align="right">{product.unitaryWeight || '-'}</TableCell>
       <TableCell align="right">{formatCurrency(product.weightPrice)}</TableCell>
       <TableCell align="right">
-        {product.additionalInformations || '-'}
+        {product.additionalInformation || '-'}
       </TableCell>
       <TableCell align="right">
         <EditIcon

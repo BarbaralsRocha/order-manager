@@ -15,14 +15,15 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-import { useGetProductsListQuery } from '../../redux/Orders.api';
 import { IFilters } from '../../interfaces/IOrder.interface';
 import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';
+import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
+import { useGetProductsQuery } from '../../../Products/redux/Products.api';
 
 interface IProps {
   filters: IFilters;
@@ -41,7 +42,21 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     isFetching: isLoadingProducts,
     isError: isErrorProducts,
     refetch: refetchProducts,
-  } = useGetProductsListQuery();
+  } = useGetProductsQuery();
+  const [listProducts, setListProducts] = useState<IOptionSelect[] | undefined>(
+    [],
+  );
+  useEffect(() => {
+    const formartList = currentDataProducts?.output.reduce((acc, value) => {
+      const format = {
+        id: value.id as number,
+        value: value.name as string,
+      };
+      acc.push(format);
+      return acc;
+    }, [] as IOptionSelect[]);
+    setListProducts(formartList);
+  }, [currentDataProducts]);
 
   const handleChangeProducts = (
     event: SelectChangeEvent<typeof filters.products>,
@@ -136,7 +151,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                     </Box>
                   )}
                 >
-                  {currentDataProducts?.output.map((product) => (
+                  {listProducts?.map((product) => (
                     <MenuItem key={product.value} value={product.value}>
                       {product.value}
                     </MenuItem>
