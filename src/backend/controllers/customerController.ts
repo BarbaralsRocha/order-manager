@@ -1,11 +1,6 @@
 import { ICustomer } from '../interfaces/Customer.interface';
 import { createCustomerSchema } from '../schemas/customerControllerSchema';
-import {
-  createCustomer as createCustomerService,
-  getAllCustomers as getAllCustomersService,
-  updateCustomer as updateCustomerService,
-  deleteCustomer as deleteCustomerService,
-} from '../services/customerService';
+import * as CustomerService from '../services/customerService';
 import { Context } from 'hono';
 import * as yup from 'yup';
 
@@ -35,7 +30,7 @@ export const createCustomer = async (c: Context) => {
       await createCustomerSchema.validate(body, {
         abortEarly: false,
       });
-      const newCustomer = await createCustomerService(body);
+      const newCustomer = await CustomerService.createCustomer(body);
       return c.json({ output: newCustomer }, 201);
     } catch (validationError) {
       const errors = (validationError as yup.ValidationError).errors;
@@ -49,7 +44,7 @@ export const createCustomer = async (c: Context) => {
 
 export const getAllCustomers = async (c: Context) => {
   try {
-    const customers = await getAllCustomersService();
+    const customers = await CustomerService.getAllCustomers();
     return c.json({ output: customers }, 200);
   } catch (error) {
     return c.json({ error: 'Failed to fetch customers' }, 500);
@@ -60,7 +55,7 @@ export const updateCustomer = async (c: Context) => {
   try {
     const customerId = parseInt(c.req.param('id'), 10);
     const customerData: ICustomer = await c.req.json();
-    const customerUpdated = await updateCustomerService(
+    const customerUpdated = await CustomerService.updateCustomer(
       customerId,
       customerData,
     );
@@ -75,7 +70,7 @@ export const updateCustomer = async (c: Context) => {
 export const deleteCustomer = async (c: Context) => {
   try {
     const customerId = parseInt(c.req.param('id'), 10);
-    const customerUpdated = await deleteCustomerService(customerId);
+    const customerUpdated = await CustomerService.deleteCustomer(customerId);
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {

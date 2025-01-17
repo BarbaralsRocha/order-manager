@@ -13,6 +13,7 @@ import objetToQueryString from '../../../../../utils/queryString';
 import Filters from '../Filters';
 import OrderManager from '../OrderManager';
 import { IFilters } from '../../interfaces/IOrder.interface';
+import { useDownloadOrdersMutation } from '../../redux/Orders.api';
 
 const OrdersContainer: React.FC = () => {
   const [filters, setFilters] = useState<IFilters>(INITIAL_VALUES_FILTERS);
@@ -20,6 +21,7 @@ const OrdersContainer: React.FC = () => {
   const [tabSelected, setTabSelected] = useState<OrderSectionType>(
     OrdersEnum.ORDERS,
   );
+  const [downloadList, {}] = useDownloadOrdersMutation();
 
   const renderComponentSelected = useMemo(
     () => ({
@@ -36,6 +38,7 @@ const OrdersContainer: React.FC = () => {
             }}
           />
           <OrderManager query={query} component={OrderList} />
+          <Button onClick={() => downloadList(query)}>Download</Button>
         </>
       ),
       [OrdersEnum.ORDERS_CUSTOMERS]: (
@@ -62,14 +65,14 @@ const OrdersContainer: React.FC = () => {
               customer: false,
               products: true,
               date: true,
-              time: true,
+              time: false,
             }}
           />
-          <OrderProducts query={query} />
+          <OrderProducts filters={filters} />
         </>
       ),
     }),
-    [filters, query],
+    [downloadList, filters, query],
   );
 
   return (

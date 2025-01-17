@@ -34,8 +34,8 @@ export const INITIAL_VALUES_PRODUCT_ORDER: IProductOrder = {
 };
 
 export const INITIAL_VALUES_FILTERS: IFilters = {
-  customerName: null,
-  date: null,
+  customerId: null,
+  startDate: null,
   time: null,
   products: [],
 };

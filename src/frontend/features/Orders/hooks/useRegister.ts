@@ -23,7 +23,7 @@ interface IUseRegister {
 }
 
 const useRegister = (): IUseRegister => {
-  const { setFieldTouched, setFieldValue } = useFormikContext<IOrder>();
+  const { setFieldTouched, setFieldValue, values } = useFormikContext<IOrder>();
 
   const insertRegister: {
     <T extends { id: number | null }>(

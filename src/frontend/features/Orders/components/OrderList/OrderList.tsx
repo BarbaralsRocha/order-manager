@@ -76,12 +76,12 @@ const OrderList: React.FC<IProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.output, isUninitialized, isError, isLoading]);
 
-  if (isErrorGetOrder) {
-    return <ServiceFail refetch={refetch} />;
-  }
-
   if (isFetching) {
     return <OrderListSkeleton />;
+  }
+
+  if (isErrorGetOrder) {
+    return <ServiceFail refetch={refetch} />;
   }
 
   if (!currentData?.output.length) {

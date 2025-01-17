@@ -32,7 +32,7 @@ const ProductsContainer: React.FC = () => {
           { label: 'Tipo', position: 'right' },
           { label: 'Preço unitário', position: 'right' },
           { label: 'Peso unitário (kg)', position: 'right' },
-          { label: 'Preço por peso', position: 'right' },
+          { label: 'Preço por Quilo', position: 'right' },
           { label: 'Observações', position: 'right' },
           { label: '', position: 'right' },
         ]}

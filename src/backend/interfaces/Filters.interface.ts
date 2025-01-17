@@ -1,6 +1,6 @@
 export interface IFilters {
-  customerName?: string | null;
-  date?: string | null;
+  customerId?: string | null;
+  startDate?: string | null;
   time?: string | null;
   products?: string[];
 }

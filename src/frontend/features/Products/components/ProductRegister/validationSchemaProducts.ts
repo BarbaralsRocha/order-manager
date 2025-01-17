@@ -15,8 +15,7 @@ const validationSchemaProduct = Yup.object().shape({
     otherwise: () => Yup.number().nullable(),
   }),
   unitaryWeight: Yup.number().when('type', {
-    is: (type: Measurement) =>
-      type === MeasurementEnum.KG || type === MeasurementEnum.UN_KG,
+    is: (type: Measurement) => type === MeasurementEnum.UN_KG,
     then: () =>
       Yup.number()
         .required('O peso unitário é obrigatório')
@@ -28,8 +27,8 @@ const validationSchemaProduct = Yup.object().shape({
       type === MeasurementEnum.KG || type === MeasurementEnum.UN_KG,
     then: () =>
       Yup.number()
-        .required('O preço por peso é obrigatório')
-        .min(0, 'O preço por peso não pode ser negativo'),
+        .required('O Preço por Quilo é obrigatório')
+        .min(0, 'O Preço por Quilo não pode ser negativo'),
     otherwise: () => Yup.number().nullable(),
   }),
   additionalInformations: Yup.string()

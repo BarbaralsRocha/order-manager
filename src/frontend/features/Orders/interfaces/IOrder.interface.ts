@@ -33,8 +33,8 @@ export type ProductOrderKeys = keyof IProductOrder;
 export type ProductOrderValues = IProductOrder[ProductOrderKeys];
 
 export interface IFilters {
-  customerName: string | null;
-  date: string | null;
+  customerId: number | null;
+  startDate: Date | null;
   time: string | null;
   products: string[];
 }

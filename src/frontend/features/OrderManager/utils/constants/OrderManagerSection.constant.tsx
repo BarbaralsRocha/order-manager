@@ -6,13 +6,14 @@ import {
   OrderManagerSectionValue,
 } from '../types/OrderManagerSection.type';
 import type * as Yup from 'yup';
-import validationSchemaCustomer from '../../../Customers/CustomersContainer/validationSchemaCustomer';
+import validationSchemaCustomer from '../../../Customers/components/CustomersContainer/validationSchemaCustomer';
 import { INITIAL_VALUES_ORDERS } from '../../../Orders/utils/constants/Order.constant';
 import validationSchemaOrders from '../../../Orders/components/OrderRegister/validationSchemaOrders';
 import OrderRegister from '../../../Orders/components/OrderRegister';
 import ProductRegister from '../../../Products/components/ProductRegister';
 import validationSchemaProducts from '../../../Products/components/ProductRegister/validationSchemaProducts';
 import { INITIAL_VALUES_PRODUCTS } from '../../../Products/utils/constants/Products.constants';
+import CustomersRegister from '../../../Customers/components/CustomersRegister';
 
 export const ColumnItems: {
   id: OrderManagerSectionType;
@@ -60,7 +61,7 @@ export const ConfigButton: Record<
     titleRegister: 'Cadastro de cliente',
     initialValues: {},
     validationSchema: validationSchemaCustomer,
-    component: <div>customers</div>,
+    component: <CustomersRegister />,
   },
   orders: {
     label: 'ADICIONAR ENCOMENDA',

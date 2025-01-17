@@ -1,4 +1,7 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -15,15 +18,17 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import React, { useCallback, useEffect, useState } from 'react';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import { IFilters } from '../../interfaces/IOrder.interface';
-import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import dayjs from 'dayjs';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
+import { useGetProductsQuery } from '../../../Products/redux/Products.api';
+import { IFilters } from '../../interfaces/IOrder.interface';
 import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';
 import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
-import { useGetProductsQuery } from '../../../Products/redux/Products.api';
+import {
+  useDownloadOrdersMutation,
+  useGetCustomerListQuery,
+} from '../../redux/Orders.api';
 
 interface IProps {
   filters: IFilters;
@@ -43,20 +48,48 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     isError: isErrorProducts,
     refetch: refetchProducts,
   } = useGetProductsQuery();
+  const {
+    currentData: currentDataCustomers,
+    isFetching: isLoadingCustomers,
+    isError: isErrorCustomers,
+    refetch: refetchCustomers,
+  } = useGetCustomerListQuery();
+
   const [listProducts, setListProducts] = useState<IOptionSelect[] | undefined>(
     [],
   );
+
+  const [listCustomers, setListCustomers] = useState<
+    { id: number; label: string }[] | undefined
+  >([]);
+
   useEffect(() => {
-    const formartList = currentDataProducts?.output.reduce((acc, value) => {
-      const format = {
-        id: value.id as number,
-        value: value.name as string,
-      };
-      acc.push(format);
-      return acc;
-    }, [] as IOptionSelect[]);
-    setListProducts(formartList);
-  }, [currentDataProducts]);
+    const formartListProducts = currentDataProducts?.output.reduce(
+      (acc, value) => {
+        const format = {
+          id: value.id as number,
+          value: value.name as string,
+        };
+        acc.push(format);
+        return acc;
+      },
+      [] as IOptionSelect[],
+    );
+
+    const formartListCustomers = currentDataCustomers?.output.reduce(
+      (acc, value) => {
+        const format = {
+          id: value.id as number,
+          label: value.fantasyName as string,
+        };
+        acc.push(format);
+        return acc;
+      },
+      [] as { id: number; label: string }[],
+    );
+    setListProducts(formartListProducts);
+    setListCustomers(formartListCustomers);
+  }, [currentDataProducts, currentDataCustomers]);
 
   const handleChangeProducts = (
     event: SelectChangeEvent<typeof filters.products>,
@@ -79,6 +112,11 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     [setFilters],
   );
 
+  useEffect(() => {
+    const selectedDate = new Date();
+    handleChange('startDate', selectedDate);
+  }, [handleChange]);
+
   return (
     <Box gap={1}>
       <Box>
@@ -91,16 +129,23 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
           display="flex"
           gap={2}
           sx={{ paddingLeft: 0 }}
-          alignItems="flex-start"
+          alignItems="flex-end"
         >
           {hasFilter.customer && (
-            <TextField
-              sx={{ m: 0, marginTop: 1 }}
-              id="outlined-basic"
-              label="Filtrar por cliente"
-              variant="outlined"
-              value={filters.customerName}
-              onChange={(e) => handleChange('customerName', e.target.value)}
+            <Autocomplete
+              disablePortal
+              options={listCustomers || []}
+              sx={{ width: 300 }}
+              onChange={(_, newValue) => {
+                handleChange('customerId', newValue ? newValue.id : null);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Filtrar por cliente"
+                  value={filters.customerId}
+                />
+              )}
             />
           )}
           {hasFilter.date && (
@@ -110,8 +155,12 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                   label="Data da entrega"
                   views={['year', 'month', 'day']}
                   format="DD/MM/YYYY"
-                  value={filters.date ? dayjs(filters.date) : undefined}
-                  onChange={(e) => handleChange('date', e && e.toISOString())}
+                  value={
+                    filters.startDate ? dayjs(filters.startDate) : undefined
+                  }
+                  onChange={(e) =>
+                    handleChange('startDate', e && new Date(e.toISOString()))
+                  }
                 />
               </DemoContainer>
             </LocalizationProvider>
@@ -122,8 +171,13 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                 <TimePicker
                   ampm={false}
                   label="Filtrar por horário"
-                  value={filters.time ? dayjs(filters.time) : undefined}
-                  onChange={(e) => handleChange('time', e && e.format('HH:mm'))}
+                  value={filters.time ? dayjs(filters.time) : null}
+                  onChange={(e) => {
+                    if (!filters.startDate) {
+                      handleChange('startDate', dayjs().toISOString());
+                    }
+                    handleChange('time', e && e?.toISOString());
+                  }}
                 />
               </DemoItem>
             </LocalizationProvider>
@@ -152,7 +206,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                   )}
                 >
                   {listProducts?.map((product) => (
-                    <MenuItem key={product.value} value={product.value}>
+                    <MenuItem key={product.value} value={product.id}>
                       {product.value}
                     </MenuItem>
                   ))}

@@ -12,9 +12,9 @@ model Product {
   name                 String         @db.VarChar(255)             
   additionalInformation String?       @db.VarChar(255)             
   type                 ProductType                             
-  unityPrice           Decimal        @db.Decimal(10, 2)           
-  unitaryWeight        Decimal        @db.Decimal(10, 3)           
-  weightPrice          Decimal        @db.Decimal(10, 2)           
+  unityPrice           Decimal?        @db.Decimal(10, 2)           
+  unitaryWeight        Decimal?        @db.Decimal(10, 3)           
+  weightPrice          Decimal?       @db.Decimal(10, 2)           
   createdAt            DateTime       @default(now())           
   updatedAt         DateTime  @default(now()) @updatedAt   
   orderDetails         OrderDetail[]  // Inverso para OrderDetail
@@ -37,7 +37,7 @@ model Customer {
   phoneNumber        String    @db.VarChar(20) 
   updatedAt         DateTime  @default(now()) @updatedAt
   createdAt          DateTime  @default(now())
-  orders             Order[]   // Inverso para Order
+  orders             Order[]   
 }
 
 model Order {

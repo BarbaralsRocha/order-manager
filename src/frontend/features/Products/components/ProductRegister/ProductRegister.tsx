@@ -167,7 +167,7 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               />
 
               <CurrencyInput
-                label="Preço por peso"
+                label="Preço por Quilo"
                 value={values.weightPrice}
                 onChange={(e: IDecimal) =>
                   handleChange('weightPrice', e.floatValue)

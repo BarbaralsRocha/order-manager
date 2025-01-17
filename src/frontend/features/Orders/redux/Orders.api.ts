@@ -16,7 +16,7 @@ export const OrdersApi = createApi({
   endpoints: (builder) => ({
     getOrders: builder.query<ContractResponse<IOrder[]>, string>({
       query: (params) => ({
-        url: `${endpoint}/orders`,
+        url: `${endpoint}/orders?${params}`,
       }),
     }),
     getTotalProducts: builder.query<ContractResponse<ITotalProducts[]>, string>(
@@ -54,9 +54,9 @@ export const OrdersApi = createApi({
         method: 'DELETE',
       }),
     }),
-    downloadOrders: builder.mutation<null, void>({
-      query: () => ({
-        url: `${endpoint}/orders/export`,
+    downloadOrders: builder.mutation<null, string>({
+      query: (filters: string) => ({
+        url: `${endpoint}/orders/export?${filters}`,
         method: 'GET',
         responseHandler: (response: Response) => response?.blob(),
       }),
@@ -75,6 +75,7 @@ export const OrdersApi = createApi({
 export const {
   useGetOrdersQuery,
   useGetTotalProductsQuery,
+  useLazyGetTotalProductsQuery,
   useGetCustomerListQuery,
   useSendOrderMutation,
   useDeleteOrderMutation,

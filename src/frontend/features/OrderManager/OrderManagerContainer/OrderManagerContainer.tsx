@@ -8,7 +8,7 @@ import {
 } from '../utils/constants/OrderManagerSection.constant';
 import { ManageOrdersEnum } from '../utils/enums/ManageOrders.enum';
 import { useMemo } from 'react';
-import CustomersContainer from '../../Customers/CustomersContainer';
+import CustomersContainer from '../../Customers/components/CustomersContainer';
 import { Add } from '@mui/icons-material';
 import useDrawer from '../../../commons/hooks/useDrawer';
 import FormFormik from '../../../commons/components/FormFormik';

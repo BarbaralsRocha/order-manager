@@ -16,7 +16,7 @@ const OrderListItems = ({ rowData, editProduct, deleteProduct }: IProps) => {
         {rowData.product?.name}
       </TableCell>
       <TableCell align="right">{rowData.type}</TableCell>
-      <TableCell align="right">{rowData.quantity}</TableCell>
+      <TableCell align="right">{rowData.quantity || rowData.weight}</TableCell>
       <TableCell align="right">{rowData.additionalInformation}</TableCell>
       {editProduct && deleteProduct && (
         <TableCell align="right">

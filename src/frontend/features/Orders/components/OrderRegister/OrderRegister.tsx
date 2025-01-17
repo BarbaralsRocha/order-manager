@@ -71,6 +71,8 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   const [listProducts, setListProducts] = useState<IOptionSelect[] | undefined>(
     [],
   );
+  const [renderKeyQty, setRenderKeyQty] = useState(0);
+  const [renderKey, setRenderKey] = useState(200);
   const [products, setProducts] = useState<IProductOrder>(
     INITIAL_VALUES_PRODUCT_ORDER,
   );
@@ -139,7 +141,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
       if (selectedProduct) {
         setProducts((prev) => ({
           ...prev,
-          name: selectedProduct.name,
+          product: selectedProduct,
           productId: Number(selectedId),
         }));
       }
@@ -154,6 +156,8 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
       values.orderDetails,
     );
     setProducts(INITIAL_VALUES_PRODUCT_ORDER);
+    setRenderKey((prevKey) => prevKey + 1);
+    setRenderKeyQty((prevKey) => prevKey + 1);
   };
 
   const disableButtonToAddProduct = useMemo(() => {
@@ -228,7 +232,6 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             </FormControl>
           </SkeletonComponent>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {/* <DemoItem> */}
             <DateTimePicker
               ampm={false}
               label="Data da entrega"
@@ -242,7 +245,6 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
                 setTimeout(() => setFieldTouched('deliveryDate', true));
               }}
             />
-            {/* </DemoItem> */}
           </LocalizationProvider>
         </Box>
         <Divider />
@@ -254,7 +256,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             display: 'flex',
             paddingLeft: 4,
             paddingRight: 4,
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: 2,
           }}
         >
@@ -311,30 +313,33 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             label="Qtde"
             variant="outlined"
             type="number"
+            key={renderKeyQty}
             data-testid="quantity"
             sx={{ width: 100 }}
-            value={products.quantity || ''}
-            onChange={(e) =>
+            value={products.quantity?.toString() || null}
+            onChange={(e) => {
               setProducts((prev) => ({
                 ...prev,
                 ...(prev.type === MeasurementEnum.UN
-                  ? { quantity: Number(e.target.value) }
+                  ? { quantity: Number(e.target.value), weight: null }
                   : {
                       weight: Number(e.target.value),
+                      quantity: null,
                     }),
-              }))
-            }
+              }));
+            }}
           />
 
           <TextField
             label="Comentário"
             variant="outlined"
+            key={renderKey}
             data-testid="additionalInformations"
-            value={products.additionalInformation || ''}
+            value={products.additionalInformation || undefined}
             onChange={(e) =>
               setProducts((prev) => ({
                 ...prev,
-                additionalInformations: e.target.value,
+                additionalInformation: e.target.value,
               }))
             }
             sx={{ width: 200 }}
@@ -382,7 +387,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
                 deleteProduct={() => {
                   setProducts(INITIAL_VALUES_PRODUCT_ORDER);
                   handleRemoveRegister(
-                    'products',
+                    'orderDetails',
                     rowData,
                     values.orderDetails,
                   );
