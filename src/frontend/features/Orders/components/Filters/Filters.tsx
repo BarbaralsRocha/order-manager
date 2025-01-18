@@ -25,10 +25,7 @@ import { useGetProductsQuery } from '../../../Products/redux/Products.api';
 import { IFilters } from '../../interfaces/IOrder.interface';
 import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';
 import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
-import {
-  useDownloadOrdersMutation,
-  useGetCustomerListQuery,
-} from '../../redux/Orders.api';
+import { useGetCustomerListQuery } from '../../redux/Orders.api';
 
 interface IProps {
   filters: IFilters;
@@ -112,11 +109,6 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     [setFilters],
   );
 
-  useEffect(() => {
-    const selectedDate = new Date();
-    handleChange('startDate', selectedDate);
-  }, [handleChange]);
-
   return (
     <Box gap={1}>
       <Box>
@@ -124,29 +116,51 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
           Filtros
         </Typography>
       </Box>
-      <Box display="flex" gap={2} sx={{ paddingLeft: 0 }} alignItems="flex-end">
+      <Box
+        display="flex"
+        gap={2}
+        sx={{ paddingLeft: 0 }}
+        alignItems="flex-start"
+      >
         <Box
           display="flex"
           gap={2}
           sx={{ paddingLeft: 0 }}
-          alignItems="flex-end"
+          alignItems="flex-start"
         >
           {hasFilter.customer && (
-            <Autocomplete
-              disablePortal
-              options={listCustomers || []}
-              sx={{ width: 300 }}
-              onChange={(_, newValue) => {
-                handleChange('customerId', newValue ? newValue.id : null);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Filtrar por cliente"
-                  value={filters.customerId}
+            <SkeletonComponent
+              width={300}
+              height={56}
+              sx={{ m: 1 }}
+              loading={isLoadingCustomers}
+            >
+              <FormControl>
+                <Autocomplete
+                  disablePortal
+                  options={listCustomers || []}
+                  sx={{ width: 300, paddingTop: 1 }}
+                  onChange={(_, newValue) => {
+                    handleChange('customerId', newValue ? newValue.id : null);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Filtrar por cliente"
+                      value={filters.customerId}
+                    />
+                  )}
                 />
-              )}
-            />
+                {isErrorCustomers && (
+                  <Box display="flex" gap={1} marginTop={1}>
+                    <Typography variant="caption" color="error">
+                      Erro ao carregar a lista de clientes
+                    </Typography>
+                    <AutorenewIcon onClick={refetchCustomers} />
+                  </Box>
+                )}
+              </FormControl>
+            </SkeletonComponent>
           )}
           {hasFilter.date && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -227,9 +241,11 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
           variant="contained"
           color="secondary"
           size="small"
-          onClick={() => setFilters(INITIAL_VALUES_FILTERS)}
+          onClick={() =>
+            setFilters({ ...INITIAL_VALUES_FILTERS, startDate: null })
+          }
           sx={{
-            paddingTop: 0,
+            marginTop: 1,
             height: 56,
             fontWeight: 600,
           }}

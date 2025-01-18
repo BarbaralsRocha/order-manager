@@ -17,7 +17,9 @@ const OrderListItems = ({ rowData, editProduct, deleteProduct }: IProps) => {
       </TableCell>
       <TableCell align="right">{rowData.type}</TableCell>
       <TableCell align="right">{rowData.quantity || rowData.weight}</TableCell>
-      <TableCell align="right">{rowData.additionalInformation}</TableCell>
+      <TableCell align="right">
+        {rowData.additionalInformation || '-'}
+      </TableCell>
       {editProduct && deleteProduct && (
         <TableCell align="right">
           {<EditIcon sx={{ marginRight: 2 }} onClick={editProduct} />}

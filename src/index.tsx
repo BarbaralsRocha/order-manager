@@ -5,18 +5,18 @@ import App from './App';
 import { worker } from './frontend/commons/mocks/browser';
 
 const enableMocking = async () => {
-  // if (process.env.REACT_APP_ENV_NAME === 'LOCAL') {
-  // await worker.start();
-  // }
+  if (process.env.REACT_APP_ENV_NAME === 'LOCAL') {
+    // await worker.start();
+  }
 };
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
-// enableMocking().then(() => {
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
-// });
+enableMocking().then(() => {
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+});

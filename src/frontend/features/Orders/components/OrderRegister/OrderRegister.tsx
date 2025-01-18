@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import {
   FormControl,
   InputLabel,
@@ -9,7 +8,7 @@ import {
   Divider,
   Typography,
   Button,
-  SelectChangeEvent,
+  Autocomplete,
 } from '@mui/material';
 import { useFormikContext } from 'formik';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,17 +33,17 @@ import EmptyState from '../../../../commons/components/EmptyState';
 import TableRender from '../../../../commons/components/TableRender';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import OrderListItems from '../OrderListItems';
-import useSnackBar from '../../../../commons/hooks/useSnackbar';
 import { Measurement } from '../../../../commons/types/Measurement.type';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
-import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
 import { useGetProductsQuery } from '../../../Products/redux/Products.api';
 import { MeasurementEnum } from '../../../../commons/enums/Measurement.enum';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../commons/redux/store';
 
 dayjs.locale('pt-br');
 
 interface IProps {
-  labelButton?: 'Cadastrar' | 'Editar';
+  labelButton?: 'Cadastrar' | 'Finalizar';
 }
 
 const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
@@ -62,93 +61,77 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   } = useGetProductsQuery();
   const [sendOrder, sendOrderMutation] = useSendOrderMutation();
   const [editOrder, editOrderMutation] = useEditOrderMutation();
-  const { values, setFieldValue, setFieldTouched } = useFormikContext<IOrder>();
+  const { values, setFieldValue, setFieldTouched, errors } =
+    useFormikContext<IOrder>();
   const { handleCloseDrawer } = useDrawer();
   const { insertRegister, handleRemoveRegister } = useRegister();
   const [listCustomers, setListCustomers] = useState<
-    IOptionSelect[] | undefined
+    { id: number; label: string }[] | undefined
   >([]);
-  const [listProducts, setListProducts] = useState<IOptionSelect[] | undefined>(
-    [],
-  );
+  const [listProducts, setListProducts] = useState<
+    { id: number; label: string }[] | undefined
+  >([]);
   const [renderKeyQty, setRenderKeyQty] = useState(0);
   const [renderKey, setRenderKey] = useState(200);
   const [products, setProducts] = useState<IProductOrder>(
     INITIAL_VALUES_PRODUCT_ORDER,
   );
-  const IS_EDITING = labelButton === 'Editar';
+  const { refecth } = useSelector((store: RootState) => store.OrdersReducer);
+  const IS_EDITING = labelButton === 'Finalizar';
 
   useAlertHandler({
     apiResult: sendOrderMutation,
     successMessage: 'Dados salvos!',
     errorMessage: 'Não foi possivel salvar os dados!',
-    callback: () => handleCloseDrawer(),
+    callback: () => {
+      handleCloseDrawer();
+      if (!refecth) return;
+      refecth();
+    },
   });
 
   useAlertHandler({
     apiResult: editOrderMutation,
     successMessage: 'Dados salvos!',
     errorMessage: 'Não foi possivel salvar os dados!',
-    callback: () => handleCloseDrawer(),
+    callback: () => {
+      handleCloseDrawer();
+      if (!refecth) return;
+      refecth();
+    },
   });
-
+  console.log({ errors });
   useEffect(() => {
-    const formartList = currentDataCustomer?.output.reduce((acc, value) => {
-      const format = {
-        id: value.id,
-        value: value.fantasyName || value.name,
-      };
-      acc.push(format);
-      return acc;
-    }, [] as IOptionSelect[]);
+    const formartList = currentDataCustomer?.output.reduce(
+      (acc, value) => {
+        const format = {
+          id: value.id,
+          label: value.fantasyName || value.name,
+        };
+        acc.push(format);
+        return acc;
+      },
+      [] as { id: number; label: string }[],
+    );
     setListCustomers(formartList);
   }, [currentDataCustomer]);
 
   useEffect(() => {
-    const formartList = currentDataProducts?.output.reduce((acc, value) => {
-      const format = {
-        id: value.id as number,
-        value: value.name as string,
-      };
-      acc.push(format);
-      return acc;
-    }, [] as IOptionSelect[]);
+    const formartList = currentDataProducts?.output.reduce(
+      (acc, value) => {
+        const format = {
+          id: value.id as number,
+          label: value.name as string,
+        };
+        acc.push(format);
+        return acc;
+      },
+      [] as { id: number; label: string }[],
+    );
     setListProducts(formartList);
   }, [currentDataProducts]);
 
-  const handleCustomerChange = useCallback(
-    (event: SelectChangeEvent<number>) => {
-      const selectedId = event.target.value as number;
-      const selectedCustomer = currentDataCustomer?.output.find(
-        (customer) => customer.id === selectedId,
-      );
-
-      if (selectedCustomer) {
-        setFieldValue('customer.id', selectedCustomer.id);
-        setFieldValue('customer.name', selectedCustomer.name);
-      }
-    },
-    [currentDataCustomer?.output, setFieldValue],
-  );
-
-  const handleProductChange = useCallback(
-    (event: SelectChangeEvent<number>) => {
-      const selectedId = event.target.value as number;
-      const selectedProduct = currentDataProducts?.output.find(
-        (product) => product.id === selectedId,
-      );
-
-      if (selectedProduct) {
-        setProducts((prev) => ({
-          ...prev,
-          product: selectedProduct,
-          productId: Number(selectedId),
-        }));
-      }
-    },
-    [currentDataProducts?.output],
-  );
-
+  console.log({ values });
   const handleInsertProduct = () => {
     insertRegister<IProductOrder>(
       'orderDetails',
@@ -167,11 +150,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   }, [products]);
 
   const isOrderComplete = useMemo(() => {
-    const requiredFields = [
-      values.customer?.id,
-      values.customer?.name,
-      values.deliveryDate,
-    ];
+    const requiredFields = [values.customerId, values.deliveryDate];
 
     return (
       requiredFields.every((field) => field !== null && field !== undefined) &&
@@ -183,9 +162,40 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     return IS_EDITING ? editOrder(values) : sendOrder(values);
   }, [IS_EDITING, editOrder, sendOrder, values]);
 
+  const IS_TYPE = useCallback(
+    (type: Measurement) => {
+      return products.product?.type?.includes(type);
+    },
+    [products.product?.type],
+  );
+
+  const findCustomer = useMemo(() => {
+    return listCustomers?.find((customer) => customer.id === values.customerId);
+  }, [listCustomers, values.customerId]);
+
+  const findProduct = useMemo(() => {
+    return listProducts?.find((product) => product.id === products.productId);
+  }, [listProducts, products.productId]);
+
+  const setProductOnChange = useCallback(
+    (id: number | null) => {
+      const productSelected = currentDataProducts?.output?.find(
+        (p) => p.id === id,
+      );
+      if (productSelected) {
+        setProducts((prev) => ({
+          ...prev,
+          product: productSelected,
+          productId: Number(id),
+        }));
+      }
+    },
+    [currentDataProducts],
+  );
+
   return (
     <S.Container>
-      <div style={{ paddingTop: 32 }}>
+      <div style={{ paddingTop: 32, overflow: 'scrollbars' }}>
         <Box
           sx={{
             display: 'flex',
@@ -199,28 +209,23 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             height={56}
             loading={isLoadingCustomer}
           >
-            <FormControl fullWidth sx={{ width: 300 }}>
-              <InputLabel>Selecione o cliente</InputLabel>
-              <Select
-                variant="outlined"
-                disabled={isErrorCustomer}
-                data-testid="customer"
-                value={values.customerId || undefined}
-                label="Selecione o cliente"
-                onChange={(e) => {
-                  handleCustomerChange(e);
+            <FormControl>
+              <Autocomplete
+                disablePortal
+                options={listCustomers || []}
+                sx={{ width: 300, paddingTop: 0 }}
+                value={findCustomer || null}
+                onChange={(_, newValue) => {
+                  setFieldValue('customerId', newValue ? newValue.id : null);
                 }}
-              >
-                {listCustomers?.map((customer) => (
-                  <MenuItem
-                    data-testid={customer.id}
-                    key={customer.id}
-                    value={customer.id}
-                  >
-                    {customer.value}
-                  </MenuItem>
-                ))}
-              </Select>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Selecionar cliente"
+                    value={values.customerId}
+                  />
+                )}
+              />
               {isErrorCustomer && (
                 <Box display="flex" gap={1} marginTop={1}>
                   <Typography variant="caption" color="error">
@@ -235,8 +240,8 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             <DateTimePicker
               ampm={false}
               label="Data da entrega"
-              views={['year', 'month', 'day', 'hours', 'minutes']}
-              format="DD/MM/YYYY hh:mm a"
+              views={['year', 'month', 'day', 'hours']}
+              format="DD/MM/YYYY      HH:mm"
               value={
                 values.deliveryDate ? dayjs(values.deliveryDate) : undefined
               }
@@ -251,6 +256,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
         <Typography sx={{ p: 4 }} variant="h6">
           Adicionar produto
         </Typography>
+
         <Box
           sx={{
             display: 'flex',
@@ -265,22 +271,23 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             height={56}
             loading={isLoadingProducts}
           >
-            <FormControl fullWidth sx={{ width: 300 }}>
-              <InputLabel>Selecione o produto</InputLabel>
-              <Select
-                value={products.productId || ''}
-                label=" Selecione o produto"
-                data-testid="product"
-                onChange={(e) => {
-                  handleProductChange(e);
+            <FormControl>
+              <Autocomplete
+                disablePortal
+                options={listProducts || []}
+                sx={{ width: 300, paddingTop: 0 }}
+                value={findProduct || null}
+                onChange={(_, newValue) => {
+                  setProductOnChange(newValue ? newValue.id : null);
                 }}
-              >
-                {listProducts?.map((product) => (
-                  <MenuItem key={product.id} value={product.id}>
-                    {product.value}
-                  </MenuItem>
-                ))}
-              </Select>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Selecionar o produto"
+                    value={products.productId}
+                  />
+                )}
+              />
               {isErrorProducts && (
                 <Box display="flex" gap={1} marginTop={1}>
                   <Typography variant="caption" color="error">
@@ -291,24 +298,6 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               )}
             </FormControl>
           </SkeletonComponent>
-          <FormControl fullWidth sx={{ width: 100 }}>
-            <InputLabel>Medida</InputLabel>
-            <Select
-              value={products.type || ''}
-              label="Medida"
-              data-testid="type"
-              onChange={(e) =>
-                setProducts((prev) => ({
-                  ...prev,
-                  type: e.target.value as Measurement,
-                }))
-              }
-            >
-              <MenuItem value="UN">UN</MenuItem>
-              <MenuItem value="KG">KG</MenuItem>
-            </Select>
-          </FormControl>
-
           <TextField
             label="Qtde"
             variant="outlined"
@@ -316,7 +305,11 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             key={renderKeyQty}
             data-testid="quantity"
             sx={{ width: 100 }}
-            value={products.quantity?.toString() || null}
+            value={
+              products.quantity?.toString() ||
+              products.weight?.toString() ||
+              null
+            }
             onChange={(e) => {
               setProducts((prev) => ({
                 ...prev,
@@ -329,6 +322,25 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               }));
             }}
           />
+
+          <FormControl fullWidth sx={{ width: 100 }}>
+            <InputLabel>Medida</InputLabel>
+            <Select
+              value={products.type || ''}
+              label="Medida"
+              data-testid="type"
+              disabled={!products.productId}
+              onChange={(e) =>
+                setProducts((prev) => ({
+                  ...prev,
+                  type: e.target.value as Measurement,
+                }))
+              }
+            >
+              {IS_TYPE('UN') && <MenuItem value="UN">UN</MenuItem>}
+              {IS_TYPE('KG') && <MenuItem value="KG">KG</MenuItem>}
+            </Select>
+          </FormControl>
 
           <TextField
             label="Comentário"

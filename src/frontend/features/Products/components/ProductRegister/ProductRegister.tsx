@@ -149,6 +149,15 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               </MenuItem>
             </Select>
           </FormControl>
+          {SHOW_WEIGHT_PRICE && (
+            <CurrencyInput
+              label="Preço por Quilo"
+              value={values.weightPrice}
+              onChange={(e: IDecimal) =>
+                handleChange('weightPrice', e.floatValue)
+              }
+            />
+          )}
           {SHOW_UNITY_PRICE && (
             <CurrencyInput
               label="Preço unitário"
@@ -158,24 +167,13 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               }
             />
           )}
-          {SHOW_WEIGHT_PRICE && (
-            <>
-              <DecimalInput
-                value={values.unitaryWeight || undefined}
-                onChange={(e) => handleChange('unitaryWeight', Number(e.value))}
-                label="Peso unitário"
-              />
-
-              <CurrencyInput
-                label="Preço por Quilo"
-                value={values.weightPrice}
-                onChange={(e: IDecimal) =>
-                  handleChange('weightPrice', e.floatValue)
-                }
-              />
-            </>
+          {SHOW_UNITY_PRICE && (
+            <DecimalInput
+              value={values.unitaryWeight || undefined}
+              onChange={(e) => handleChange('unitaryWeight', Number(e.value))}
+              label="Peso unitário"
+            />
           )}
-
           <TextField
             label="Informações adicionais"
             variant="outlined"

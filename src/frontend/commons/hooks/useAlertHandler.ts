@@ -22,7 +22,11 @@ const useAlertHandler = ({
         showSnackbar({ message: 'Salvando dados...', type: 'info' });
         return;
       }
-      if (apiResult.currentData?.output || apiResult.data?.output) {
+      if (
+        apiResult.currentData?.output ||
+        apiResult.data?.output ||
+        apiResult.isSuccess
+      ) {
         callback();
         showSnackbar({ message: successMessage, type: 'success' });
         return;

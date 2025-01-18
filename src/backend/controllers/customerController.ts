@@ -3,6 +3,7 @@ import { createCustomerSchema } from '../schemas/customerControllerSchema';
 import * as CustomerService from '../services/customerService';
 import { Context } from 'hono';
 import * as yup from 'yup';
+import { handleError } from '../utils/handleErrors';
 
 export const createCustomer = async (c: Context) => {
   try {
@@ -37,8 +38,7 @@ export const createCustomer = async (c: Context) => {
       return c.json({ validationResult: errors }, 400);
     }
   } catch (error) {
-    console.error({ error });
-    return c.json({ error: 'Failed to create customer' }, 500);
+    return handleError(c, error, 'Failed to create customer');
   }
 };
 
@@ -47,7 +47,7 @@ export const getAllCustomers = async (c: Context) => {
     const customers = await CustomerService.getAllCustomers();
     return c.json({ output: customers }, 200);
   } catch (error) {
-    return c.json({ error: 'Failed to fetch customers' }, 500);
+    return handleError(c, error, 'Failed to fetch customers');
   }
 };
 
@@ -62,8 +62,7 @@ export const updateCustomer = async (c: Context) => {
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {
-    console.error(error);
-    return c.json({ error: 'Failed to create customer' }, 500);
+    return handleError(c, error, 'Failed to update customer');
   }
 };
 
@@ -74,7 +73,6 @@ export const deleteCustomer = async (c: Context) => {
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {
-    console.error(error);
-    return c.json({ error: 'Failed to create customer' }, 500);
+    return handleError(c, error, 'Failed to delete customer');
   }
 };

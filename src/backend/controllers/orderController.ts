@@ -4,21 +4,8 @@ import * as orderService from '../services/orderService';
 import { ICreateOrder } from '../interfaces/Order.interface';
 import XLSX from 'xlsx';
 import { IFilters } from '../interfaces/Filters.interface';
-
-// Função para lidar com erros
-const handleError = (c: Context, error: unknown, message: string) => {
-  console.error(error);
-  return c.json({ error: message }, 500);
-};
-
-const handleValidation = (c: Context, message: string) =>
-  c.json(
-    {
-      message,
-      success: false,
-    },
-    400,
-  );
+import { addFormattedRows } from '../utils/formatRows';
+import { handleError, handleValidation } from '../utils/handleErrors';
 
 // Cria uma nova ordem
 export const createOrder = async (c: Context) => {
@@ -60,6 +47,7 @@ export const updateOrder = async (c: Context) => {
     const orderId = parseInt(c.req.param('id'), 10);
     const orderData: ICreateOrder = await c.req.json();
     const orderUpdated = await orderService.updateOrder(orderId, orderData);
+    console.log({ orderUpdated });
     return c.json({ output: orderUpdated }, 201);
   } catch (error) {
     return handleError(c, error, 'Failed to update order');
@@ -75,63 +63,6 @@ export const deleteOrder = async (c: Context) => {
   } catch (error) {
     return handleError(c, error, 'Failed to delete order');
   }
-};
-
-const addFormattedRows = (ws: XLSX.WorkSheet, orders: any[]) => {
-  let rowIndex = 1;
-  ws['!merges'] = ws['!merges'] || [];
-  orders.forEach((order) => {
-    ws[`A${rowIndex}`] = { v: 'Cliente:', s: { font: { bold: true } } };
-    ws[`B${rowIndex}`] = {
-      v: order.customer.fantasyName || order.customer.name,
-      s: { alignment: { horizontal: 'center' } },
-    };
-    ws[`C${rowIndex}`] = { v: '', s: { alignment: { horizontal: 'center' } } };
-    ws[`D${rowIndex}`] = { v: '', s: { alignment: { horizontal: 'center' } } };
-    ws['!merges']?.push({
-      s: { r: rowIndex - 1, c: 1 },
-      e: { r: rowIndex - 1, c: 3 },
-    });
-
-    rowIndex++;
-
-    const deliveryDate = new Date(order.deliveryDate);
-    const formattedDate = deliveryDate
-      .toLocaleString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-      .replace(',', ' -');
-    ws[`A${rowIndex}`] = { v: 'Data:', s: { font: { bold: true } } };
-    ws[`B${rowIndex}`] = {
-      v: formattedDate,
-      s: { alignment: { horizontal: 'center' } },
-    };
-    ws['!merges']?.push({
-      s: { r: rowIndex - 1, c: 1 },
-      e: { r: rowIndex - 1, c: 3 },
-    });
-    rowIndex++;
-    rowIndex++;
-    order.orderDetails.forEach((detail: any) => {
-      ws[`A${rowIndex}`] = {
-        v: `${detail.quantity || detail.weight} ${detail.type}`,
-        s: { alignment: { horizontal: 'center' } },
-      };
-      ws[`B${rowIndex}`] = {
-        v: detail.product.name,
-        s: { alignment: { horizontal: 'center' } },
-      };
-      rowIndex++;
-    });
-
-    rowIndex++;
-  });
-
-  ws['!ref'] = `A1:D${rowIndex - 1}`;
 };
 
 // Exporta ordens para um arquivo Excel

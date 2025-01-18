@@ -19,13 +19,13 @@ interface WhereClause {
 const prisma = new PrismaClient();
 
 export const createOrder = async (orderData: ICreateOrder) => {
-  const { customer, deliveryDate, additionalInformation, orderDetails } =
+  const { customerId, deliveryDate, additionalInformation, orderDetails } =
     orderData;
 
   try {
     return await prisma.order.create({
       data: {
-        customerId: customer.id,
+        customerId,
         deliveryDate: new Date(deliveryDate),
         additionalInformation,
         orderDetails: {
@@ -41,6 +41,7 @@ export const createOrder = async (orderData: ICreateOrder) => {
       include: { orderDetails: { include: { product: true } }, customer: true },
     });
   } catch (error) {
+    console.log({ error });
     throw new Error('Failed to create order.');
   }
 };
@@ -102,20 +103,30 @@ export const updateOrder = async (orderId: number, orderData: ICreateOrder) => {
         deliveryDate: orderData.deliveryDate,
         additionalInformation: orderData.additionalInformation,
         orderDetails: {
-          update: orderData.orderDetails.map((product: ICreateOrderDetail) => ({
-            where: { id: orderId },
-            data: {
-              productId: product.productId,
-              quantity: product.quantity,
-              type: product.type,
-              weight: product.weight,
-              additionalInformation: product.additionalInformation,
-            },
-          })),
+          upsert: orderData.orderDetails.map((product: ICreateOrderDetail) => {
+            return {
+              where: { id: product.id || 0 }, // Use 0 to ensure it doesn't match any existing record
+              update: {
+                productId: product.productId,
+                quantity: product.quantity,
+                type: product.type,
+                weight: product.weight,
+                additionalInformation: product.additionalInformation,
+              },
+              create: {
+                productId: product.productId,
+                quantity: product.quantity,
+                type: product.type,
+                weight: product.weight,
+                additionalInformation: product.additionalInformation,
+              },
+            };
+          }),
         },
       },
     });
   } catch (error) {
+    console.log({ error });
     throw new Error('Failed to update order.');
   }
 };

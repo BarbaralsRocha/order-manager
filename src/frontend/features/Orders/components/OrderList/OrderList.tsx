@@ -138,19 +138,20 @@ const OrderList: React.FC<IProps> = ({
             <Button
               size="large"
               startIcon={<EditIcon />}
-              onClick={() =>
+              onClick={() => {
+                console.log({ order });
                 setComponentAtDrawer({
-                  title: 'Editar Encomenda',
+                  title: 'Alterar Encomenda',
                   component: (
                     <FormFormik
                       initialValues={order}
                       validationSchema={validationSchemaOrders}
                     >
-                      <OrderRegister labelButton="Editar" />
+                      <OrderRegister labelButton="Finalizar" />
                     </FormFormik>
                   ),
-                })
-              }
+                });
+              }}
             />
             <Button
               size="large"

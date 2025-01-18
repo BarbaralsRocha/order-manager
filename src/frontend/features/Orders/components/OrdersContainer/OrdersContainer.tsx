@@ -21,7 +21,6 @@ const OrdersContainer: React.FC = () => {
   const [tabSelected, setTabSelected] = useState<OrderSectionType>(
     OrdersEnum.ORDERS,
   );
-  const [downloadList, {}] = useDownloadOrdersMutation();
 
   const renderComponentSelected = useMemo(
     () => ({
@@ -38,7 +37,6 @@ const OrdersContainer: React.FC = () => {
             }}
           />
           <OrderManager query={query} component={OrderList} />
-          <Button onClick={() => downloadList(query)}>Download</Button>
         </>
       ),
       [OrdersEnum.ORDERS_CUSTOMERS]: (
@@ -72,7 +70,7 @@ const OrdersContainer: React.FC = () => {
         </>
       ),
     }),
-    [downloadList, filters, query],
+    [filters, query],
   );
 
   return (

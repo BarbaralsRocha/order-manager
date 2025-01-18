@@ -70,13 +70,13 @@ const OrderCustomerList: React.FC<IProps> = ({ order, refetch }) => {
           sx={{ marginRight: 2 }}
           onClick={() =>
             setComponentAtDrawer({
-              title: 'Editar Encomenda',
+              title: 'Alterar Encomenda',
               component: (
                 <FormFormik
                   initialValues={order}
                   validationSchema={validationSchemaOrders}
                 >
-                  <OrderRegister labelButton="Editar" />
+                  <OrderRegister labelButton="Finalizar" />
                 </FormFormik>
               ),
             })

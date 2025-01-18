@@ -1,8 +1,7 @@
-import { FetchBaseQueryMeta, createApi } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '../../../commons/redux/baseQuery';
 import { ContractResponse } from '../../../commons/interfaces/IMockContract';
 import { ICustomer } from '../../Customers/interfaces/ICustomer';
-import { downloadFile } from '../../../../utils/downloadFile';
 
 const endpoint = '/api';
 
@@ -33,6 +32,15 @@ export const OrdersApi = createApi({
         body: body,
       }),
     }),
+    deleteCustomer: builder.mutation<
+      ContractResponse<boolean>,
+      { customerId: number }
+    >({
+      query: ({ customerId }) => ({
+        url: `${endpoint}/customer/${customerId}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -40,4 +48,5 @@ export const {
   useGetCustomerListQuery,
   useAddCustomerMutation,
   useEditCustomerMutation,
+  useDeleteCustomerMutation,
 } = OrdersApi;

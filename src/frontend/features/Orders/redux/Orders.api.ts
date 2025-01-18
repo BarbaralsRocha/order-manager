@@ -2,7 +2,6 @@ import { FetchBaseQueryMeta, createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '../../../commons/redux/baseQuery';
 import { ContractResponse } from '../../../commons/interfaces/IMockContract';
 import { IOrder } from '../interfaces/IOrder.interface';
-import { IOptionSelect } from '../../../commons/interfaces/ICommon.interface';
 import { ITotalProducts } from '../interfaces/ITotalProducts.interface';
 import { ICustomer } from '../../Customers/interfaces/ICustomer';
 import { downloadFile } from '../../../../utils/downloadFile';
@@ -74,6 +73,7 @@ export const OrdersApi = createApi({
 
 export const {
   useGetOrdersQuery,
+  useLazyGetOrdersQuery,
   useGetTotalProductsQuery,
   useLazyGetTotalProductsQuery,
   useGetCustomerListQuery,

@@ -9,6 +9,8 @@ import {
   useEditCustomerMutation,
 } from '../../redux/Customers.api';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../commons/redux/store';
 
 interface IProps {
   labelButton?: 'Cadastrar' | 'Editar';
@@ -26,6 +28,7 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   const [addCustomer, addCustomerMutation] = useAddCustomerMutation();
   const [editCustomer, editCustomerMutation] = useEditCustomerMutation();
   const IS_EDITING = labelButton === 'Editar';
+  const { refecth } = useSelector((store: RootState) => store.CustomersReducer);
 
   useEffect(() => {
     setFieldTouched('', true);
@@ -37,9 +40,9 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     errorMessage: 'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseDrawer();
-      // if (refetchList) {
-      //   refetchList();
-      // }
+      if (refecth) {
+        refecth();
+      }
     },
   });
 
@@ -49,9 +52,9 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     errorMessage: 'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseDrawer();
-      // if (refetchList) {
-      //   refetchList();
-      // }
+      if (refecth) {
+        refecth();
+      }
     },
   });
 

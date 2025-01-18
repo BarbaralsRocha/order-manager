@@ -18,7 +18,10 @@ const OrderProducts: React.FC<{ filters: IFilters }> = ({ filters }) => {
       selectedDate.setDate(selectedDate.getDate() + 1);
       setStartDate(adjustedStartDate);
       setEndDate(selectedDate);
+      return;
     }
+    setStartDate(null);
+    setEndDate(null);
   }, [filters.startDate]);
 
   const filtersTotals = {
@@ -28,11 +31,12 @@ const OrderProducts: React.FC<{ filters: IFilters }> = ({ filters }) => {
   };
 
   const query = objetToQueryString(filtersTotals);
+
   const { currentData, isFetching, isError, refetch } =
     useGetTotalProductsQuery(query);
 
   return (
-    <Box width="60%">
+    <Box sx={{ width: 'calc(100vw - 50%)' }}>
       <TableRender<ITotalProducts>
         columns={[{ label: 'Produto' }, { label: 'Total', position: 'right' }]}
         data={currentData?.output || []}
@@ -50,7 +54,7 @@ const OrderProducts: React.FC<{ filters: IFilters }> = ({ filters }) => {
             <TableCell component="th" scope="row">
               {product.product}
             </TableCell>
-            <TableCell align="right">{product.totalOrders}</TableCell>
+            <TableCell align="right">{product.quantity}</TableCell>
           </>
         )}
       />
