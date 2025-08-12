@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                   Int            @id @default(autoincrement()) 
+  name                 String         @db.VarChar(255)             
+  additionalInformation String?       @db.VarChar(255)             
+  type                 ProductType                             
+  unityPrice           Decimal?        @db.Decimal(10, 2)           
+  unitaryWeight        Decimal?        @db.Decimal(10, 3)           
+  weightPrice          Decimal?       @db.Decimal(10, 2)           
+  createdAt            DateTime       @default(now())           
+  updatedAt         DateTime  @default(now()) @updatedAt   
+  orderDetails         OrderDetail[]  // Inverso para OrderDetail
+}
+
+enum ProductType {
+  KG
+  UN
+  UN_KG
+}
+
+model Customer {
+  id                 Int       @id @default(autoincrement())
+  name               String    @db.VarChar(255)   
+  fantasyName        String    @db.VarChar(255)   
+  additionalInformation String? @db.VarChar(255)  
+  address            String    @db.VarChar(255) 
+  cnpj               String    @unique @db.VarChar(18)
+  stateRegistration  String    @db.VarChar(20)
+  phoneNumber        String    @db.VarChar(20) 
+  updatedAt         DateTime  @default(now()) @updatedAt
+  createdAt          DateTime  @default(now())
+  orders             Order[]   
+}
+
+model Order {
+  id                  Int            @id @default(autoincrement())
+  customerId          Int
+  customer            Customer       @relation(fields: [customerId], references: [id])
+  deliveryDate        DateTime
+  additionalInformation String?      @db.VarChar(255)
+  createdAt           DateTime       @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
+  orderDetails        OrderDetail[]  // Sem `onDelete` aqui
+}
+
+model OrderDetail {
+  id                  Int            @id @default(autoincrement())
+  orderId             Int
+  order               Order          @relation(fields: [orderId], references: [id], onDelete: Cascade) // Adicione `onDelete: Cascade` aqui
+  productId           Int
+  product             Product        @relation(fields: [productId], references: [id])
+  quantity            Int?
+  type                ProductType
+  weight              Decimal?        @db.Decimal(10, 3)
+  additionalInformation String?      @db.VarChar(255)
+  updatedAt         DateTime  @default(now()) @updatedAt
+  createdAt           DateTime       @default(now())
+}

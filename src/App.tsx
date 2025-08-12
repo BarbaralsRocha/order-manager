@@ -1,26 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Routes from './Routes';
+import { Provider } from 'react-redux';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme';
+import { store } from './frontend/commons/redux/store';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store()}>
+      <ThemeProvider theme={theme}>
+        <Routes />;
+      </ThemeProvider>
+    </Provider>
   );
-}
+};
 
 export default App;
