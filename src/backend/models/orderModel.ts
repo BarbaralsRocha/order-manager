@@ -172,7 +172,7 @@ export const getTotalByProductInDateRange = async (filters: IFilters) => {
     const orderIds = orders.map((order) => order.id);
 
     const groupedTotals = await prisma.orderDetail.groupBy({
-      by: ['productId'],
+      by: ['productId', 'type'],
       where: {
         orderId: {
           in: orderIds,
@@ -213,7 +213,7 @@ export const getTotalByProductInDateRange = async (filters: IFilters) => {
       return {
         productId: product?.id,
         product: product?.name || 'Produto desconhecido',
-        type: product?.type || 'Desconhecido',
+        type: group.type || 'Desconhecido',
         unitPrice: product?.unityPrice || 0,
         quantity: group._sum?.quantity || 0,
         weight: group._sum?.weight || 0,

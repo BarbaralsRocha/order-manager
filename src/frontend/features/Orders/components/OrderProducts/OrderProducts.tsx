@@ -38,7 +38,11 @@ const OrderProducts: React.FC<{ filters: IFilters }> = ({ filters }) => {
   return (
     <Box sx={{ width: 'calc(100vw - 50%)' }}>
       <TableRender<ITotalProducts>
-        columns={[{ label: 'Produto' }, { label: 'Total', position: 'right' }]}
+        columns={[
+          { label: 'Produto' },
+          { label: 'Medida' },
+          { label: 'Total', position: 'right' },
+        ]}
         data={currentData?.output || []}
         emptyState={
           <EmptyState
@@ -54,7 +58,12 @@ const OrderProducts: React.FC<{ filters: IFilters }> = ({ filters }) => {
             <TableCell component="th" scope="row">
               {product.product}
             </TableCell>
-            <TableCell align="right">{product.quantity}</TableCell>
+            <TableCell component="th" scope="row">
+              {product.type}
+            </TableCell>
+            <TableCell align="right">
+              {product.quantity || product.weight}
+            </TableCell>
           </>
         )}
       />

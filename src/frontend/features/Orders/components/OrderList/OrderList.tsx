@@ -139,7 +139,6 @@ const OrderList: React.FC<IProps> = ({
               size="large"
               startIcon={<EditIcon />}
               onClick={() => {
-                console.log({ order });
                 setComponentAtDrawer({
                   title: 'Alterar Encomenda',
                   component: (

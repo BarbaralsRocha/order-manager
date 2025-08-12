@@ -10,7 +10,7 @@ import {
   Button,
 } from '@mui/material';
 import { useFormikContext } from 'formik';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 import * as S from './ProductRegister.style';
@@ -39,6 +39,7 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     useFormikContext<IProduct>();
   const [addProduct, addProductMutation] = useAddProductMutation();
   const [editProduct, editProductMutation] = useEditProductMutation();
+  const [forceRenderKey, setForceRender] = useState<number>(0);
   const { handleCloseDrawer } = useDrawer();
   const { refetchList } = useSelector(
     (state: RootState) => state.ProductsReducer,
@@ -97,7 +98,8 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   };
 
   const cleanFields = (fields: (keyof IProduct)[]) => {
-    fields.forEach((field) => handleChange(field, ''));
+    fields.forEach((field) => handleChange(field, null));
+    setForceRender((prev) => prev + 1);
   };
 
   const disableButton = useMemo(() => {
@@ -151,8 +153,9 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
           </FormControl>
           {SHOW_WEIGHT_PRICE && (
             <CurrencyInput
+              key={`weightPrice-${forceRenderKey}`}
               label="Preço por Quilo"
-              value={values.weightPrice}
+              value={values.weightPrice || undefined}
               onChange={(e: IDecimal) =>
                 handleChange('weightPrice', e.floatValue)
               }
@@ -160,15 +163,17 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
           )}
           {SHOW_UNITY_PRICE && (
             <CurrencyInput
+              key={`unityPrice-${forceRenderKey}`}
               label="Preço unitário"
-              value={values.unityPrice}
+              value={values.unityPrice || undefined}
               onChange={(e: IDecimal) =>
                 handleChange('unityPrice', e.floatValue)
               }
             />
           )}
-          {SHOW_UNITY_PRICE && (
+          {SHOW_WEIGHT_PRICE && (
             <DecimalInput
+              key={`unitaryWeight-${forceRenderKey}`}
               value={values.unitaryWeight || undefined}
               onChange={(e) => handleChange('unitaryWeight', Number(e.value))}
               label="Peso unitário"

@@ -12,11 +12,11 @@ const validationSchemaCustomer = Yup.object().shape({
     .required('CNPJ é obrigatório'),
   phoneNumber: Yup.string()
     .nonNullable()
-    .matches(/^\d{11}$/, 'Telefone inválido')
+    .matches(/^\d{10}$/, 'Telefone inválido')
     .required('Telefone é obrigatório'),
   stateRegistration: Yup.string()
     .matches(/^\d{12}$/, 'Inscrição Estadual inválida')
-    .nullable(),
+    .required('Inscrição Estadual é obrigatório'),
   additionalInformation: Yup.string()
     .max(500, 'As informações adicionais devem ter no máximo 500 caracteres')
     .nullable(),

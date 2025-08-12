@@ -85,8 +85,9 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     errorMessage: 'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseDrawer();
-      if (!refecth) return;
-      refecth();
+      if (refecth) {
+        refecth();
+      }
     },
   });
 
@@ -96,11 +97,12 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     errorMessage: 'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseDrawer();
-      if (!refecth) return;
-      refecth();
+      if (refecth) {
+        refecth();
+      }
     },
   });
-  console.log({ errors });
+
   useEffect(() => {
     const formartList = currentDataCustomer?.output.reduce(
       (acc, value) => {
@@ -131,7 +133,6 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     setListProducts(formartList);
   }, [currentDataProducts]);
 
-  console.log({ values });
   const handleInsertProduct = () => {
     insertRegister<IProductOrder>(
       'orderDetails',

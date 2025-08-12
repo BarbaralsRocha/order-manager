@@ -84,6 +84,7 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     return IS_EDITING ? editCustomer({ body: values }) : addCustomer(values);
   }, [IS_EDITING, addCustomer, editCustomer, values]);
 
+  console.log({ errors });
   return (
     <Box
       height="100%"
@@ -169,7 +170,7 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
         </Grid>
         <Grid item component="div" lg={12} xl={12} md={12}>
           <InputMask
-            mask="(99) 99999-9999"
+            mask="(99) 9999-9999"
             value={phoneNumber}
             onChange={(e) =>
               handleMaskedChange('phoneNumber', e.target.value, setPhoneNumber)

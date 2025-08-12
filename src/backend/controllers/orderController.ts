@@ -47,7 +47,6 @@ export const updateOrder = async (c: Context) => {
     const orderId = parseInt(c.req.param('id'), 10);
     const orderData: ICreateOrder = await c.req.json();
     const orderUpdated = await orderService.updateOrder(orderId, orderData);
-    console.log({ orderUpdated });
     return c.json({ output: orderUpdated }, 201);
   } catch (error) {
     return handleError(c, error, 'Failed to update order');
