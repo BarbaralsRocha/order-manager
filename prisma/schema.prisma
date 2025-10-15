@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique @db.VarChar(255)
+  password         String    @db.VarChar(255)
+  resetToken       String?   @db.VarChar(255)
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("users")
+}
+
 model Product {
   id                   Int            @id @default(autoincrement()) 
   name                 String         @db.VarChar(255)             

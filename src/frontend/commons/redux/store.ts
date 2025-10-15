@@ -3,6 +3,7 @@ import rootReducer from './root.reducer';
 import { ManageOrdersApi } from '../../features/OrderManager/redux/ManageOrders.api';
 import { OrdersApi } from '../../features/Orders/redux/Orders.api';
 import { ProductsApi } from '../../features/Products/redux/Products.api';
+import { AuthApi } from './services/authApi';
 
 export const store = (preloadedState?: Partial<RootState>) =>
   configureStore({
@@ -12,11 +13,12 @@ export const store = (preloadedState?: Partial<RootState>) =>
       getDefaultMiddleware({
         immutableCheck: false,
         serializableCheck: false,
-      }).concat(
+      }).concat([
         ManageOrdersApi.middleware,
         OrdersApi.middleware,
         ProductsApi.middleware,
-      ),
+        AuthApi.middleware,
+      ]),
     preloadedState,
   });
 
