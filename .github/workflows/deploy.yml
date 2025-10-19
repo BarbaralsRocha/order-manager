@@ -1,0 +1,188 @@
+# .github/workflows/deploy.yml
+
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout do código
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Setup Node.js com cache
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Instalar dependências do frontend
+      - name: 📦 Install frontend dependencies
+        run: npm ci
+
+      # 4. Build do frontend localmente
+      - name: 🏗️ Build frontend
+        env:
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_API_URL: https://pedidosnicolina.com/api
+        run: npm run build
+
+      # 5. Criar arquivo compactado do build
+      - name: 📦 Create build archive
+        run: |
+          cd build
+          tar -czf ../build.tar.gz .
+          cd ..
+          ls -lh build.tar.gz
+          echo "✅ Build archive created: $(du -h build.tar.gz | cut -f1)"
+
+      # 6. Enviar build.tar.gz para a VM
+      - name: 📤 Upload build to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build.tar.gz"
+          target: "/home/ubuntu/projects/ordermanager/order-manager/"
+          timeout: 10m
+
+      # 7. Deploy e configuração na VM
+      - name: 🚀 Deploy on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 10m
+          script: |
+            set -e
+            
+            echo "📂 Navegando para o diretório do projeto..."
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            
+            echo "📦 Extraindo build do frontend..."
+            # Backup do build anterior
+            if [ -d "build" ]; then
+              echo "💾 Criando backup do build anterior..."
+              mv build build.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # Criar pasta build e extrair
+            mkdir -p build
+            tar -xzf build.tar.gz -C build/
+            rm build.tar.gz
+            echo "✅ Frontend extraído com sucesso"
+            
+            echo "🔧 Atualizando backend..."
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            
+            # Atualizar código do backend via git
+            git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
+            
+            # Navegar para o diretório do backend
+            cd src
+            
+            # Criar/atualizar .env do backend
+            echo "🔐 Configurando variáveis de ambiente..."
+            cat > .env << 'EOF'
+            AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+            AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+            DB_HOST=${{ secrets.DATABASE_HOST }}
+            DB_USER=${{ secrets.DATABASE_USER }}
+            DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            DB_NAME=${{ secrets.DATABASE_NAME }}
+            PORT=4000
+            NODE_ENV=production
+            EOF
+            
+            echo "📦 Instalando dependências do backend..."
+            bun install
+            
+            echo "♻️ Reiniciando serviços..."
+            # Reiniciar backend com PM2
+            pm2 restart api-backend || pm2 start index.ts --name "api-backend" --interpreter bun
+            
+            # Aguardar backend iniciar
+            sleep 3
+            
+            # Reiniciar Nginx
+            sudo systemctl restart nginx
+            
+            echo "📊 Status dos serviços:"
+            pm2 status
+            echo ""
+            sudo systemctl status nginx --no-pager -l | head -10
+            
+            echo "✅ Deploy concluído com sucesso!"
+
+      # 8. Verificar saúde do site
+      - name: 🏥 Health check
+        run: |
+          echo "⏳ Aguardando 15 segundos para o site inicializar..."
+          sleep 15
+          
+          echo "🔍 Verificando se o site está respondendo..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://pedidosnicolina.com)
+          
+          if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+            echo "✅ Site está no ar! (HTTP $response)"
+          else
+            echo "⚠️ Site retornou HTTP $response"
+            echo "Tentando novamente em 10 segundos..."
+            sleep 10
+            response=$(curl -s -o /dev/null -w "%{http_code}" https://pedidosnicolina.com)
+            if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+              echo "✅ Site está no ar na segunda tentativa! (HTTP $response)"
+            else
+              echo "❌ Site não está respondendo corretamente"
+              exit 1
+            fi
+          fi
+
+      # 9. Limpar builds antigos na VM (manter últimos 3)
+      - name: 🧹 Cleanup old builds
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            echo "🧹 Limpando builds antigos (mantendo últimos 3)..."
+            ls -t build.backup.* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+            echo "✅ Limpeza concluída"
+
+      # 10. Notificação final
+      - name: 🎉 Deployment complete
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Deploy realizado com sucesso!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🌐 Frontend: https://pedidosnicolina.com"
+          echo "🔌 Backend API: https://pedidosnicolina.com/api"
+          echo "📊 Logs: ssh ubuntu@${{ secrets.REMOTE_HOST }} 'pm2 logs api-backend'"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      # 11. Notificação de erro
+      - name: ❌ Deployment failed
+        if: failure()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌ Deploy falhou!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Verifique os logs acima"
+          echo "🔍 Debug: ssh ubuntu@${{ secrets.REMOTE_HOST }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
