@@ -93,7 +93,7 @@ jobs:
             git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
             
             # Navegar para o diretório do backend
-            cd src
+            cd src/backend
             
             # Criar/atualizar .env do backend
             echo "🔐 Configurando variáveis de ambiente..."
