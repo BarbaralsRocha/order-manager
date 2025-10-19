@@ -110,12 +110,11 @@ jobs:
             
             echo "📦 Instalando dependências do backend..."
             export BUN_INSTALL="$HOME/.bun"
-            export PATH="$BUN_INSTALL/bin:$PATH"
+            export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
             bun install
             
             echo "♻️ Reiniciando serviços..."
             # Reiniciar backend com PM2
-            export PATH="/usr/local/bin:$PATH"
             pm2 restart api-backend || pm2 start index.ts --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
