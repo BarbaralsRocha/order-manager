@@ -115,6 +115,7 @@ jobs:
             
             echo "♻️ Reiniciando serviços..."
             # Reiniciar backend com PM2
+            export PATH="/usr/local/bin:$PATH"
             pm2 restart api-backend || pm2 start index.ts --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
