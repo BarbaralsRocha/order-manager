@@ -4,9 +4,9 @@ import DrawerContainer from './frontend/commons/components/DrawerContainer';
 import SnackbarContainer from './frontend/commons/components/SnackbarContainer';
 import ModalContainer from './frontend/commons/components/ModalContainer';
 import LoginPage from './frontend/features/Auth/LoginPage';
+import { AuthGuard } from './frontend/features/Auth/AuthGuard';
 // import RegisterPage from './frontend/features/Auth/RegisterPage';
 // import ForgotPasswordPage from './frontend/features/Auth/ForgotPasswordPage';
-import AuthGuard from './frontend/features/Auth/AuthGuard';
 const RoutesOrderManager: React.FC = () => {
   return (
     <>
@@ -16,6 +16,7 @@ const RoutesOrderManager: React.FC = () => {
       <HashRouter>
         <Routes>
           {/* Public routes */}
+          <Route path="/callback" element={<div>Processando login...</div>} />
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
           {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}

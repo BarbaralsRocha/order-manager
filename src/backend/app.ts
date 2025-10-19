@@ -4,6 +4,7 @@ import customerRoutes from './routes/customerRoutes';
 import ordersRoutes from './routes/orderRoutes';
 import { ContentfulStatusCode } from 'hono/utils/http-status';
 import { authRouter } from './routes/authRoutes';
+import { authMiddleware } from './middleware/authMiddleware';
 
 const app = new Hono();
 
@@ -23,9 +24,13 @@ app.use('/api/*', async (c, next) => {
   await next();
 });
 
+// Rota pública para autenticação
+app.route('/api', authRouter);
+
+// Rotas protegidas que requerem autenticação
+app.use('/api/*', authMiddleware);
 app.route('/api', productRoutes);
 app.route('/api', customerRoutes);
 app.route('/api', ordersRoutes);
-app.route('/api', authRouter);
 
 export default app;

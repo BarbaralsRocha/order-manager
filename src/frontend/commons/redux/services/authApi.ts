@@ -1,13 +1,18 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '../baseQuery';
 
-interface AuthResponse {
-  token: string;
+interface User {
+  id: string;
+  email: string;
 }
 
-interface LoginRequest {
+interface ValidateTokenResponse {
+  user: User;
+}
+
+interface Auth0CallbackRequest {
+  sub: string;
   email: string;
-  password: string;
 }
 
 export const AuthApi = createApi({
@@ -15,14 +20,20 @@ export const AuthApi = createApi({
   baseQuery,
   refetchOnMountOrArgChange: true,
   endpoints: (builder) => ({
-    login: builder.mutation<AuthResponse, LoginRequest>({
-      query: (credentials) => ({
-        url: '/api/login',
+    validateToken: builder.query<ValidateTokenResponse, void>({
+      query: () => ({
+        url: '/api/validate-token',
+        method: 'GET',
+      }),
+    }),
+    auth0Callback: builder.mutation<{ user: User }, Auth0CallbackRequest>({
+      query: (auth0User) => ({
+        url: '/api/auth0-callback',
         method: 'POST',
-        body: credentials,
+        body: auth0User,
       }),
     }),
   }),
 });
 
-export const { useLoginMutation } = AuthApi;
+export const { useValidateTokenQuery, useAuth0CallbackMutation } = AuthApi;

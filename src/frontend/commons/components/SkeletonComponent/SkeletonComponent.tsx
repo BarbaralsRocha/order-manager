@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Skeleton } from '@mui/material';
 
 interface IProps {
-  width: number;
+  width: number | string;
   height: number;
   loading: boolean;
   children: ReactNode;

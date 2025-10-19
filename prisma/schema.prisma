@@ -10,9 +10,7 @@ datasource db {
 model User {
   id               String    @id @default(uuid())
   email            String    @unique @db.VarChar(255)
-  password         String    @db.VarChar(255)
-  resetToken       String?   @db.VarChar(255)
-  resetTokenExpiry DateTime?
+  auth0Id          String    @unique @db.VarChar(255)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 

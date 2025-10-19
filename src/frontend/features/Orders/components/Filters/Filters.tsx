@@ -6,6 +6,7 @@ import {
   Button,
   Chip,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   OutlinedInput,
@@ -116,143 +117,144 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
           Filtros
         </Typography>
       </Box>
-      <Box
-        display="flex"
-        gap={2}
-        sx={{ paddingLeft: 0 }}
-        alignItems="flex-start"
-      >
-        <Box
-          display="flex"
-          gap={2}
-          sx={{ paddingLeft: 0 }}
-          alignItems="flex-start"
-        >
+      <Grid container spacing={2} sx={{ paddingLeft: 0 }}>
+        <Grid container item spacing={2} xs={12} md={11}>
           {hasFilter.customer && (
-            <SkeletonComponent
-              width={300}
-              height={56}
-              sx={{ m: 1 }}
-              loading={isLoadingCustomers}
-            >
-              <FormControl>
-                <Autocomplete
-                  disablePortal
-                  options={listCustomers || []}
-                  sx={{ width: 300, paddingTop: 1 }}
-                  onChange={(_, newValue) => {
-                    handleChange('customerId', newValue ? newValue.id : null);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Filtrar por cliente"
-                      value={filters.customerId}
-                    />
-                  )}
-                />
-                {isErrorCustomers && (
-                  <Box display="flex" gap={1} marginTop={1}>
-                    <Typography variant="caption" color="error">
-                      Erro ao carregar a lista de clientes
-                    </Typography>
-                    <AutorenewIcon onClick={refetchCustomers} />
-                  </Box>
-                )}
-              </FormControl>
-            </SkeletonComponent>
-          )}
-          {hasFilter.date && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DatePicker']}>
-                <DatePicker
-                  label="Data da entrega"
-                  views={['year', 'month', 'day']}
-                  format="DD/MM/YYYY"
-                  value={
-                    filters.startDate ? dayjs(filters.startDate) : undefined
-                  }
-                  onChange={(e) =>
-                    handleChange('startDate', e && new Date(e.toISOString()))
-                  }
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          )}
-          {hasFilter.time && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoItem sx={{ marginTop: 1 }}>
-                <TimePicker
-                  ampm={false}
-                  label="Filtrar por horário"
-                  value={filters.time ? dayjs(filters.time) : null}
-                  onChange={(e) => {
-                    if (!filters.startDate) {
-                      handleChange('startDate', dayjs().toISOString());
-                    }
-                    handleChange('time', e && e?.toISOString());
-                  }}
-                />
-              </DemoItem>
-            </LocalizationProvider>
-          )}
-          {hasFilter.products && (
-            <SkeletonComponent
-              width={300}
-              height={56}
-              sx={{ m: 1 }}
-              loading={isLoadingProducts}
-            >
-              <FormControl sx={{ width: 300, m: 0, marginTop: 1 }}>
-                <InputLabel>Filtrar por produtos</InputLabel>
-                <Select
-                  multiple
-                  label="Filtrar por produtos"
-                  value={filters.products}
-                  onChange={handleChangeProducts}
-                  input={<OutlinedInput label="Filtrar por produtos" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+              <SkeletonComponent
+                width="100%"
+                height={56}
+                loading={isLoadingCustomers}
+                sx={{ width: '100%' }}
+              >
+                <FormControl fullWidth>
+                  <Autocomplete
+                    disablePortal
+                    options={listCustomers || []}
+                    sx={{ paddingTop: 1 }}
+                    onChange={(_, newValue) => {
+                      handleChange('customerId', newValue ? newValue.id : null);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Filtrar por cliente"
+                        value={filters.customerId}
+                      />
+                    )}
+                  />
+                  {isErrorCustomers && (
+                    <Box display="flex" gap={1} marginTop={1}>
+                      <Typography variant="caption" color="error">
+                        Erro ao carregar a lista de clientes
+                      </Typography>
+                      <AutorenewIcon onClick={refetchCustomers} />
                     </Box>
                   )}
-                >
-                  {listProducts?.map((product) => (
-                    <MenuItem key={product.value} value={product.id}>
-                      {product.value}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {isErrorProducts && (
-                  <Box display="flex" gap={1} marginTop={1}>
-                    <Typography variant="caption" color="error">
-                      Erro ao carregar a lista de produtos
-                    </Typography>
-                    <AutorenewIcon onClick={refetchProducts} />
-                  </Box>
-                )}
-              </FormControl>
-            </SkeletonComponent>
+                </FormControl>
+              </SkeletonComponent>
+            </Grid>
           )}
-        </Box>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="small"
-          onClick={() =>
-            setFilters({ ...INITIAL_VALUES_FILTERS, startDate: null })
-          }
-          sx={{
-            marginTop: 1,
-            height: 56,
-            fontWeight: 600,
-          }}
-        >
-          Limpar filtros
-        </Button>
-      </Box>
+          {hasFilter.date && (
+            <Grid item xs={12} sm={6} md={3}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={['DatePicker']}>
+                  <DatePicker
+                    label="Data da entrega"
+                    views={['year', 'month', 'day']}
+                    format="DD/MM/YYYY"
+                    value={
+                      filters.startDate ? dayjs(filters.startDate) : undefined
+                    }
+                    onChange={(e) =>
+                      handleChange('startDate', e && new Date(e.toISOString()))
+                    }
+                    sx={{ width: '100%' }}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            </Grid>
+          )}
+          {hasFilter.time && (
+            <Grid item xs={12} sm={6} md={3}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoItem sx={{ marginTop: 1 }}>
+                  <TimePicker
+                    ampm={false}
+                    label="Filtrar por horário"
+                    value={filters.time ? dayjs(filters.time) : null}
+                    onChange={(e) => {
+                      if (!filters.startDate) {
+                        handleChange('startDate', dayjs().toISOString());
+                      }
+                      handleChange('time', e && e?.toISOString());
+                    }}
+                  />
+                </DemoItem>
+              </LocalizationProvider>
+            </Grid>
+          )}
+          {hasFilter.products && (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+              <SkeletonComponent
+                width={300}
+                height={56}
+                loading={isLoadingProducts}
+                sx={{ width: '100%' }}
+              >
+                <FormControl fullWidth sx={{ marginTop: 1 }}>
+                  <InputLabel>Filtrar por produtos</InputLabel>
+                  <Select
+                    multiple
+                    label="Filtrar por produtos"
+                    value={filters.products}
+                    onChange={handleChangeProducts}
+                    input={<OutlinedInput label="Filtrar por produtos" />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {listProducts?.map((product) => (
+                      <MenuItem key={product.value} value={product.id}>
+                        {product.value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {isErrorProducts && (
+                    <Box display="flex" gap={1} marginTop={1}>
+                      <Typography variant="caption" color="error">
+                        Erro ao carregar a lista de produtos
+                      </Typography>
+                      <AutorenewIcon onClick={refetchProducts} />
+                    </Box>
+                  )}
+                </FormControl>
+              </SkeletonComponent>
+            </Grid>
+          )}
+        </Grid>
+        <Grid item xs={12} md={1}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() =>
+              setFilters({ ...INITIAL_VALUES_FILTERS, startDate: null })
+            }
+            sx={{
+              height: 56,
+              fontWeight: 600,
+              width: { xs: '100%', md: 'auto' },
+            }}
+          >
+            Limpar filtros
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
