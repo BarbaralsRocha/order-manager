@@ -109,11 +109,8 @@ jobs:
             EOF
             
             echo "📦 Instalando dependências do backend..."
-            echo "🐞 Debug PATH e localização do Bun..."
-            echo "PATH atual: $PATH"
-            which bun || echo "❌ bun não encontrado no PATH"
-            ls -lah ~/.bun/bin || echo "❌ diretório ~/.bun/bin não existe"
-            ls -lah /usr/local/bin | grep bun || echo "❌ bun não está em /usr/local/bin"
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:$PATH"
             bun install
             
             echo "♻️ Reiniciando serviços..."
