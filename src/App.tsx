@@ -13,7 +13,7 @@ const App: React.FC = () => {
       domain={process.env.REACT_APP_AUTH0_DOMAIN || ''}
       clientId={process.env.REACT_APP_AUTH0_CLIENT_ID || ''}
       authorizationParams={{
-        redirect_uri: `${process.env.REACT_APP_FRONTEND_URL}/#/callback`,
+        redirect_uri: `${process.env.REACT_APP_FRONTEND_URL}/callback`,
         audience: process.env.REACT_APP_AUTH0_AUDIENCE,
       }}
     >

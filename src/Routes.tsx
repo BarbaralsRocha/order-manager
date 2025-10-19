@@ -1,4 +1,9 @@
-import { Route, HashRouter, Navigate, Routes } from 'react-router-dom';
+import {
+  Route,
+  Navigate,
+  Routes,
+  BrowserRouter as Router,
+} from 'react-router-dom';
 import OrderManagerContainer from './frontend/features/OrderManager/OrderManagerContainer';
 import DrawerContainer from './frontend/commons/components/DrawerContainer';
 import SnackbarContainer from './frontend/commons/components/SnackbarContainer';
@@ -13,7 +18,7 @@ const RoutesOrderManager: React.FC = () => {
       <ModalContainer />
       <SnackbarContainer />
       <DrawerContainer />
-      <HashRouter>
+      <Router>
         <Routes>
           {/* Public routes */}
           <Route path="/callback" element={<div>Processando login...</div>} />
@@ -34,7 +39,7 @@ const RoutesOrderManager: React.FC = () => {
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </HashRouter>
+      </Router>
     </>
   );
 };
