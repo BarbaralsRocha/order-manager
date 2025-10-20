@@ -8,6 +8,10 @@ import { store } from './frontend/commons/redux/store';
 import { Auth0Provider } from '@auth0/auth0-react';
 
 const App: React.FC = () => {
+  console.log(
+    'REDIRECT URI:',
+    `${process.env.REACT_APP_FRONTEND_URL}/callback`,
+  );
   return (
     <Auth0Provider
       domain={process.env.REACT_APP_AUTH0_DOMAIN || ''}
