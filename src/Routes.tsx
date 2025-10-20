@@ -10,6 +10,7 @@ import SnackbarContainer from './frontend/commons/components/SnackbarContainer';
 import ModalContainer from './frontend/commons/components/ModalContainer';
 import LoginPage from './frontend/features/Auth/LoginPage';
 import { AuthGuard } from './frontend/features/Auth/AuthGuard';
+import CallbackPage from './frontend/features/Auth/CallbackPage';
 // import RegisterPage from './frontend/features/Auth/RegisterPage';
 // import ForgotPasswordPage from './frontend/features/Auth/ForgotPasswordPage';
 const RoutesOrderManager: React.FC = () => {
@@ -21,7 +22,7 @@ const RoutesOrderManager: React.FC = () => {
       <Router>
         <Routes>
           {/* Public routes */}
-          <Route path="/callback" element={<div>Processando login...</div>} />
+          <Route path="/callback" element={<CallbackPage />} />
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
           {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
