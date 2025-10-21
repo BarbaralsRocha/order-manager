@@ -114,23 +114,30 @@ jobs:
             echo "📦 Instalando dependências do backend..."
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
-            bun install
+            
+            # Verificar se existe package.json no backend
+            if [ -f "package.json" ]; then
+              echo "📦 package.json encontrado, instalando dependências..."
+              bun install
+            else
+              echo "📦 package.json não encontrado, usando dependências da raiz..."
+              cd /home/ubuntu/projects/ordermanager/order-manager
+              bun install || echo "⚠️ Bun install na raiz falhou ou não necessário"
+              cd src/backend
+            fi
             
             echo "🔄 Gerando Prisma Client..."
             cd /home/ubuntu/projects/ordermanager/order-manager
             bunx prisma generate
             
-            echo "🏗️ Buildando o backend..."
-            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
-            bun run build
-            
             echo "♻️ Reiniciando serviços..."
             # Parar o PM2 atual
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
             pm2 stop api-backend || true
             pm2 delete api-backend || true
             
-            # Iniciar o backend com o código buildado
-            pm2 start "bun run start" --name "api-backend"
+            # Iniciar o backend com server.ts (Bun executa TypeScript nativamente)
+            pm2 start server.ts --name "api-backend" --interpreter bun
             
             # Salvar configuração do PM2
             pm2 save
