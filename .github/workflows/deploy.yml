@@ -122,7 +122,7 @@ jobs:
             
             echo "♻️ Reiniciando serviços..."
             # Reiniciar backend com PM2 usando o código buildado
-            pm2 restart api-backend || pm2 start build/backend/server.js --name "api-backend" --interpreter bun
+            pm2 restart backend || pm2 start "bun run start" --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
             sleep 3
