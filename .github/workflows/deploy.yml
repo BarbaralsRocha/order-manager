@@ -92,10 +92,21 @@ jobs:
             
             # Atualizar código do backend via git
             git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
-            npx prisma generate
+            
+            echo "🔧 Configurando ambiente..."
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
+            
+            # Instalar dependências e configurar Prisma
+            echo "📦 Instalando dependências..."
+            bun install
+            
 
-            # Rodar migrations
-            npx prisma migrate deploy
+            # Gerar client e executar migrations do Prisma
+            echo "🔧 Atualizando banco de dados..."
+            bunx prisma generate
+            bunx prisma migrate deploy
+
             # Navegar para o diretório do backend
             cd src/backend
             
@@ -110,6 +121,7 @@ jobs:
             DB_NAME=${{ secrets.DATABASE_NAME }}
             PORT=4000
             NODE_ENV=production
+            DATABASE_URL=mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:3306/${{ secrets.DATABASE_NAME }}
             EOF
             
             echo "📦 Instalando dependências do backend..."
