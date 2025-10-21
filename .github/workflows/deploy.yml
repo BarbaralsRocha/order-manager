@@ -88,7 +88,6 @@ jobs:
             echo "✅ Frontend extraído com sucesso"
             
             echo "🔧 Atualizando backend..."
-            cd /home/ubuntu/projects/ordermanager/order-manager
             
             # Atualizar código do backend via git
             git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
@@ -97,16 +96,9 @@ jobs:
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
             
-            # Instalar dependências e configurar Prisma
-            echo "📦 Instalando dependências..."
-            bun install
-            
-            # Navegar para o diretório do backend
-            cd src/backend
-            
-            # Criar/atualizar .env do backend
+            # Criar/atualizar .env na raiz (para Prisma e Backend)
             echo "🔐 Configurando variáveis de ambiente..."
-            cat > .env << 'EOF'
+            cat > .env << EOF
             AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
             AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
             DB_HOST=${{ secrets.DATABASE_HOST }}
@@ -118,25 +110,42 @@ jobs:
             NODE_ENV=production
             EOF
             
-            # Criar .env na raiz apenas para o Prisma
-            echo "🔗 Criando .env raiz para o Prisma..."
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-
-            # Gerar client e executar migrations do Prisma
+            # Instalar dependências (raiz do projeto)
+            echo "📦 Instalando dependências..."
+            bun install
+            
+            # Gerar client e executar migrations do Prisma (na raiz onde está o schema)
             echo "🔧 Executando Prisma..."
-            cd /home/ubuntu/projects/ordermanager/order-manager
-            bunx prisma generate --schema prisma/schema.prisma
-            bunx prisma migrate deploy --schema prisma/schema.prisma
+            bunx prisma generate
+            bunx prisma migrate deploy || echo "⚠️ Prisma migrate falhou ou não há migrations"
             
             echo "♻️ Reiniciando serviços..."
-            # Reiniciar backend com PM2
+            
+            # CRÍTICO: Parar completamente o processo antigo
+            echo "🛑 Parando processo antigo na porta 4000..."
+            pm2 stop api-backend 2>/dev/null || true
+            pm2 delete api-backend 2>/dev/null || true
+            
+            # Garantir que a porta 4000 está livre
+            lsof -ti:4000 | xargs kill -9 2>/dev/null || true
+            
+            # Aguardar a porta liberar
+            sleep 2
+            
+            # Navegar para o diretório do backend para iniciar o servidor
+            echo "🚀 Iniciando backend atualizado..."
             cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
-            pm2 restart api-backend || pm2 start "bun run server.ts" --name "api-backend" --interpreter bun
+            pm2 start server.ts --name "api-backend" --interpreter bun
+            
+            # Salvar configuração do PM2
+            pm2 save
             
             # Aguardar backend iniciar
-            sleep 3
+            echo "⏳ Aguardando backend inicializar..."
+            sleep 5
             
             # Reiniciar Nginx
+            echo "🔄 Reiniciando Nginx..."
             sudo systemctl restart nginx
             
             echo "📊 Status dos serviços:"
