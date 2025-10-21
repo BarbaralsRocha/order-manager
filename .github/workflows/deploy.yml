@@ -119,6 +119,7 @@ jobs:
             DB_USER=${{ secrets.DATABASE_USER }}
             DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
             PORT=4000
             NODE_ENV=production
             DATABASE_URL=mysql://${{ secrets.DATABASE_USER }}:${{ secrets.DATABASE_PASSWORD }}@${{ secrets.DATABASE_HOST }}:3306/${{ secrets.DATABASE_NAME }}
