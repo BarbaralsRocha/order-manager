@@ -135,6 +135,9 @@ jobs:
             cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
             pm2 stop api-backend || true
             pm2 delete api-backend || true
+
+            echo "🧹 Limpando processos antigos na porta 4000..."
+            sudo fuser -k 4000/tcp || true
             
             # Iniciar o backend com server.ts (Bun executa TypeScript nativamente)
             pm2 start server.ts --name "api-backend" --interpreter bun
