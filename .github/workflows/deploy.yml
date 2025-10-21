@@ -101,12 +101,6 @@ jobs:
             echo "📦 Instalando dependências..."
             bun install
             
-
-            # Gerar client e executar migrations do Prisma
-            echo "🔧 Atualizando banco de dados..."
-            bunx prisma generate --schema prisma/schema.prisma --env-file src/backend/.env
-            bunx prisma migrate deploy --schema prisma/schema.prisma --env-file src/backend/.env
-
             # Navegar para o diretório do backend
             cd src/backend
             
@@ -123,6 +117,15 @@ jobs:
             PORT=4000
             NODE_ENV=production
             EOF
+            
+            # Criar .env na raiz apenas para o Prisma
+            echo "🔗 Criando .env raiz para o Prisma..."
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+
+            # Gerar client e executar migrations do Prisma
+            echo "🔧 Executando Prisma..."
+            bunx prisma generate --schema prisma/schema.prisma
+            bunx prisma migrate deploy --schema prisma/schema.prisma
             
             echo "📦 Instalando dependências do backend..."
             export BUN_INSTALL="$HOME/.bun"
