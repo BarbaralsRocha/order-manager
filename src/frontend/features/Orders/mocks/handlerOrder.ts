@@ -9,7 +9,7 @@ import {
 
 export const handlerOrder = [
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/orders/summary`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/orders/summary`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -21,7 +21,7 @@ export const handlerOrder = [
   ),
 
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/orders/products/summary`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/orders/products/summary`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -33,7 +33,7 @@ export const handlerOrder = [
   ),
 
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/orders/customers`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/orders/customers`,
     async () => {
       // await delay(3000);
       // return new HttpResponse(null, {
@@ -50,7 +50,7 @@ export const handlerOrder = [
   ),
 
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/orders/products`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/orders/products`,
     async () => {
       // await delay(3000);
       // return new HttpResponse(null, {
@@ -66,7 +66,7 @@ export const handlerOrder = [
   ),
 
   http.post(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/order`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/order`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -78,7 +78,7 @@ export const handlerOrder = [
   ),
 
   http.delete(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/order/:orderId`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/order/:orderId`,
     async () => {
       await delay(3000);
       return HttpResponse.json({

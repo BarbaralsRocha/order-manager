@@ -3,7 +3,7 @@ import { mockContract } from '../../../commons/interfaces/IMockContract';
 import { responseProducts } from './response';
 
 export const handlerProducts = [
-  http.get(`${process.env.REACT_APP_BASE_URL}/api/products`, async () => {
+  http.get(`${process.env.REACT_APP_API_URL}/api/products`, async () => {
     // await delay(3000);
     // return new HttpResponse(null, {
     //   status: 500,
@@ -17,7 +17,7 @@ export const handlerProducts = [
   }),
 
   http.put(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/product?startDate`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/product?startDate`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -29,7 +29,7 @@ export const handlerProducts = [
   ),
 
   http.post(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/product`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/product`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -41,7 +41,7 @@ export const handlerProducts = [
   ),
 
   http.delete(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/product/:productId`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/product/:productId`,
     async () => {
       await delay(3000);
       return HttpResponse.json({

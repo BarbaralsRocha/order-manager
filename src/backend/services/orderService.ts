@@ -15,6 +15,7 @@ export const getAllOrders = async (filters: IFilters) => {
 };
 
 export const updateOrder = async (orderId: number, orderData: ICreateOrder) => {
+  console.log('service', await orderModel.updateOrder(orderId, orderData));
   return orderModel.updateOrder(orderId, orderData);
 };
 

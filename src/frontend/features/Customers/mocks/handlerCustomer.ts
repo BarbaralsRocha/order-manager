@@ -4,7 +4,7 @@ import { responseCustomer } from './response';
 
 export const handlerCustomer = [
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/customer/summary`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/customer/summary`,
     async () => {
       // await delay(3000);
       // return new HttpResponse(null, {
@@ -20,7 +20,7 @@ export const handlerCustomer = [
   ),
 
   http.put(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/customer`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/customer`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -32,7 +32,7 @@ export const handlerCustomer = [
   ),
 
   http.post(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/customer`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/customer`,
     async () => {
       await delay(3000);
       return HttpResponse.json({
@@ -44,7 +44,7 @@ export const handlerCustomer = [
   ),
 
   http.delete(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/customer/:customerId`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/customer/:customerId`,
     async () => {
       await delay(3000);
       return HttpResponse.json({

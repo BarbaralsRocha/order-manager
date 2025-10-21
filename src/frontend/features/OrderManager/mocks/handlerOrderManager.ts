@@ -4,7 +4,7 @@ import { responseProfileCustomer } from './response';
 
 export const handlerOrderManager = [
   http.get(
-    `${process.env.REACT_APP_BASE_URL}/order-manager/api/v1/profile`,
+    `${process.env.REACT_APP_API_URL}/order-manager/api/v1/profile`,
     async () => {
       await delay(2000);
       return HttpResponse.json({

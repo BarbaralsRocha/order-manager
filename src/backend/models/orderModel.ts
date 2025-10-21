@@ -97,33 +97,76 @@ export const getAllOrders = async (filters: IFilters) => {
 
 export const updateOrder = async (orderId: number, orderData: ICreateOrder) => {
   try {
-    return await prisma.order.update({
+    // 1. Primeiro, vamos buscar os IDs existentes dos detalhes do pedido
+    const existingOrder = await prisma.order.findUnique({
       where: { id: orderId },
-      data: {
-        deliveryDate: orderData.deliveryDate,
-        additionalInformation: orderData.additionalInformation,
-        orderDetails: {
-          upsert: orderData.orderDetails.map((product: ICreateOrderDetail) => {
-            return {
-              where: { id: product.id || 0 }, // Use 0 to ensure it doesn't match any existing record
-              update: {
-                productId: product.productId,
-                quantity: product.quantity,
-                type: product.type,
-                weight: product.weight,
-                additionalInformation: product.additionalInformation,
-              },
-              create: {
-                productId: product.productId,
-                quantity: product.quantity,
-                type: product.type,
-                weight: product.weight,
-                additionalInformation: product.additionalInformation,
-              },
-            };
-          }),
+      include: { orderDetails: true },
+    });
+
+    if (!existingOrder) {
+      throw new Error('Order not found');
+    }
+
+    // 2. Criar um conjunto dos IDs dos detalhes que vieram na requisição
+    const updatedDetailIds = new Set(
+      orderData.orderDetails
+        .map((detail) => detail.id)
+        .filter((id): id is number => id !== undefined),
+    );
+
+    // 3. Identificar os IDs que precisam ser deletados
+    const detailsToDelete = existingOrder.orderDetails
+      .filter((detail) => !updatedDetailIds.has(detail.id))
+      .map((detail) => detail.id);
+
+    // 4. Realizar a atualização em uma transação
+    return await prisma.$transaction(async (tx) => {
+      // 4.1 Deletar os detalhes que não existem mais
+      if (detailsToDelete.length > 0) {
+        await tx.orderDetail.deleteMany({
+          where: { id: { in: detailsToDelete } },
+        });
+      }
+
+      // 4.2 Atualizar o pedido e seus detalhes
+      return tx.order.update({
+        where: { id: orderId },
+        data: {
+          deliveryDate: new Date(orderData.deliveryDate),
+          additionalInformation: orderData.additionalInformation,
+          orderDetails: {
+            upsert: orderData.orderDetails.map(
+              (product: ICreateOrderDetail) => ({
+                where: {
+                  id: product.id || 0,
+                },
+                update: {
+                  productId: product.productId,
+                  quantity: product.quantity,
+                  type: product.type,
+                  weight: product.weight,
+                  additionalInformation: product.additionalInformation,
+                },
+                create: {
+                  productId: product.productId,
+                  quantity: product.quantity,
+                  type: product.type,
+                  weight: product.weight,
+                  additionalInformation: product.additionalInformation,
+                },
+              }),
+            ),
+          },
         },
-      },
+        include: {
+          orderDetails: {
+            include: {
+              product: true,
+            },
+          },
+          customer: true,
+        },
+      });
     });
   } catch (error) {
     console.log({ error });
