@@ -114,9 +114,15 @@ jobs:
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
             bun install
             
+            echo "🔄 Gerando Prisma Client..."
+            bunx prisma generate
+            
+            echo "🏗️ Buildando o backend..."
+            bun run build
+            
             echo "♻️ Reiniciando serviços..."
-            # Reiniciar backend com PM2
-            pm2 restart api-backend || pm2 start index.ts --name "api-backend" --interpreter bun
+            # Reiniciar backend com PM2 usando o código buildado
+            pm2 restart api-backend || pm2 start build/backend/server.js --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
             sleep 3
