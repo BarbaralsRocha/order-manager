@@ -88,16 +88,19 @@ jobs:
             echo "✅ Frontend extraído com sucesso"
             
             echo "🔧 Atualizando backend..."
-            cd /home/ubuntu/projects/ordermanager/order-manager
             
             # Atualizar código do backend via git
             git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
             
             # Navegar para o diretório do backend
-            cd src/backend
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
+            
+            # Remover .env antigo
+            rm -f .env
             
             # Criar/atualizar .env do backend
             echo "🔐 Configurando variáveis de ambiente..."
+            cat > .env << EOF
             AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
             AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
             DB_HOST=${{ secrets.DATABASE_HOST }}
@@ -106,6 +109,7 @@ jobs:
             DB_NAME=${{ secrets.DATABASE_NAME }}
             PORT=4000
             NODE_ENV=production
+            EOF
             
             echo "📦 Instalando dependências do backend..."
             export BUN_INSTALL="$HOME/.bun"
@@ -119,11 +123,18 @@ jobs:
             bun run build
             
             echo "♻️ Reiniciando serviços..."
-            # Reiniciar backend com PM2 usando o código buildado
-            pm2 restart backend || pm2 start "bun run start" --name "api-backend" --interpreter bun
+            # Parar o PM2 atual
+            pm2 stop api-backend || true
+            pm2 delete api-backend || true
+            
+            # Iniciar o backend com o código buildado
+            pm2 start "bun run start" --name "api-backend"
+            
+            # Salvar configuração do PM2
+            pm2 save
             
             # Aguardar backend iniciar
-            sleep 3
+            sleep 5
             
             # Reiniciar Nginx
             sudo systemctl restart nginx
