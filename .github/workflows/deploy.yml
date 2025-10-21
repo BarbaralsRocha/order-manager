@@ -88,19 +88,20 @@ jobs:
             echo "✅ Frontend extraído com sucesso"
             
             echo "🔧 Atualizando backend..."
+            cd /home/ubuntu/projects/ordermanager/order-manager
             
             # Atualizar código do backend via git
             git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
-            
+            npx prisma generate
+
+            # Rodar migrations
+            npx prisma migrate deploy
             # Navegar para o diretório do backend
-            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
-            
-            # Remover .env antigo
-            rm -f .env
+            cd src/backend
             
             # Criar/atualizar .env do backend
             echo "🔐 Configurando variáveis de ambiente..."
-            cat > .env << EOF
+            cat > .env << 'EOF'
             AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
             AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
             DB_HOST=${{ secrets.DATABASE_HOST }}
@@ -114,39 +115,14 @@ jobs:
             echo "📦 Instalando dependências do backend..."
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
-            
-            # Verificar se existe package.json no backend
-            if [ -f "package.json" ]; then
-              echo "📦 package.json encontrado, instalando dependências..."
-              bun install
-            else
-              echo "📦 package.json não encontrado, usando dependências da raiz..."
-              cd /home/ubuntu/projects/ordermanager/order-manager
-              bun install || echo "⚠️ Bun install na raiz falhou ou não necessário"
-              cd src/backend
-            fi
-            
-            echo "🔄 Gerando Prisma Client..."
-            cd /home/ubuntu/projects/ordermanager/order-manager
-            bunx prisma generate
+            bun install
             
             echo "♻️ Reiniciando serviços..."
-            # Parar o PM2 atual
-            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
-            pm2 stop api-backend || true
-            pm2 delete api-backend || true
-
-            echo "🧹 Limpando processos antigos na porta 4000..."
-            sudo fuser -k 4000/tcp || true
-            
-            # Iniciar o backend com server.ts (Bun executa TypeScript nativamente)
-            pm2 start server.ts --name "api-backend" --interpreter bun
-            
-            # Salvar configuração do PM2
-            pm2 save
+            # Reiniciar backend com PM2
+            pm2 restart api-backend || pm2 start "bun run server.ts" --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
-            sleep 5
+            sleep 3
             
             # Reiniciar Nginx
             sudo systemctl restart nginx
