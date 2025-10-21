@@ -62,7 +62,7 @@ jobs:
 
       # 7. Deploy e configuração na VM
       - name: 🚀 Deploy on VM
-        uses: appleboy/ssh-action@v1.0.3     
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
@@ -96,7 +96,7 @@ jobs:
             echo "🔧 Configurando ambiente..."
             export BUN_INSTALL="$HOME/.bun"
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            
             # Instalar dependências e configurar Prisma
             echo "📦 Instalando dependências..."
             bun install
@@ -104,8 +104,8 @@ jobs:
 
             # Gerar client e executar migrations do Prisma
             echo "🔧 Atualizando banco de dados..."
-            bunx prisma generate
-            bunx prisma migrate deploy
+            bunx prisma generate --schema prisma/schema.prisma --env-file src/backend/.env
+            bunx prisma migrate deploy --schema prisma/schema.prisma --env-file src/backend/.env
 
             # Navegar para o diretório do backend
             cd src/backend
@@ -119,6 +119,7 @@ jobs:
             DB_USER=${{ secrets.DATABASE_USER }}
             DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
             PORT=4000
             NODE_ENV=production
             EOF
