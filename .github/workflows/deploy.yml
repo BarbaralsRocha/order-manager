@@ -124,16 +124,13 @@ jobs:
 
             # Gerar client e executar migrations do Prisma
             echo "🔧 Executando Prisma..."
+            cd /home/ubuntu/projects/ordermanager/order-manager
             bunx prisma generate --schema prisma/schema.prisma
             bunx prisma migrate deploy --schema prisma/schema.prisma
             
-            echo "📦 Instalando dependências do backend..."
-            export BUN_INSTALL="$HOME/.bun"
-            export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
-            bun install
-            
             echo "♻️ Reiniciando serviços..."
             # Reiniciar backend com PM2
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
             pm2 restart api-backend || pm2 start "bun run server.ts" --name "api-backend" --interpreter bun
             
             # Aguardar backend iniciar
