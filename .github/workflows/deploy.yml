@@ -98,7 +98,6 @@ jobs:
             
             # Criar/atualizar .env do backend
             echo "🔐 Configurando variáveis de ambiente..."
-            cat > .env << 'EOF'
             AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
             AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
             DB_HOST=${{ secrets.DATABASE_HOST }}
