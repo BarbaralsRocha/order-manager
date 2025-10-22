@@ -1,4 +1,4 @@
-import { PrismaClient, ProductType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { IProduct } from '../interfaces/Product.interface';
 
 const prisma = new PrismaClient();
@@ -44,6 +44,34 @@ export const ProductModel = {
 
   async deleteProduct(productId: number) {
     try {
+      // Verificar se o produto está sendo usado em algum pedido
+      const orderDetails = await prisma.orderDetail.findFirst({
+        where: { productId },
+        include: {
+          order: {
+            select: {
+              id: true,
+              deliveryDate: true,
+              customer: {
+                select: {
+                  fantasyName: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (orderDetails) {
+        const { order } = orderDetails;
+        throw new Error(
+          `Não é possível excluir este produto pois ele está sendo usado no pedido #${order.id} ` +
+            `do cliente ${order.customer.fantasyName} ` +
+            `com entrega em ${new Date(order.deliveryDate).toLocaleDateString()}`,
+        );
+      }
+
+      // Se não estiver sendo usado, pode deletar
       return await prisma.product.delete({
         where: { id: productId },
       });
