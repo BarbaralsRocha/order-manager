@@ -38,6 +38,7 @@ export class AuthService {
     try {
       // Decodifica o token sem verificar para obter o kid
       const decodedHeader = jwt.decode(token, { complete: true });
+      console.log('Decoded token header:', decodedHeader);
       if (
         !decodedHeader ||
         typeof decodedHeader === 'string' ||

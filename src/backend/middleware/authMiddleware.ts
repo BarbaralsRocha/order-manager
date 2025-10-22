@@ -21,7 +21,7 @@ export async function authMiddleware(c: AuthContext, next: Next) {
 
     const token = authHeader.split(' ')[1];
     const user = await authService.validateToken(token);
-
+    console.log('Authenticated user:', user);
     if (!user) {
       c.status(401);
       return c.json({ error: 'Invalid token' });
