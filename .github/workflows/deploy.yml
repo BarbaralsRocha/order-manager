@@ -97,17 +97,17 @@ jobs:
             export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
             
             # Criar/atualizar .env na raiz (para Prisma e Backend)
-            echo "🔐 Configurando variáveis de ambiente..."
-            cat > .env << EOF
+            echo "🔐 Configurando variáveis de ambiente na raiz..."
+            cat > .env << 'EOF'
             AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
             AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+            REACT_APP_AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+            REACT_APP_AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
             DB_HOST=${{ secrets.DATABASE_HOST }}
             DB_USER=${{ secrets.DATABASE_USER }}
             DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.DATABASE_NAME }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
-            REACT_APP_FRONTEND_URL=${{ secrets.REACT_APP_FRONTEND_URL }}
             PORT=3000
             NODE_ENV=production
             EOF
@@ -134,28 +134,57 @@ jobs:
             # Aguardar a porta liberar
             sleep 2
             
-            # Navegar para o diretório do backend para iniciar o servidor
-            echo "🚀 Iniciando backend atualizado..."
+            # Criar script de inicialização que carrega o .env
+            echo "📝 Criando script de inicialização..."
             cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
-            pm2 start server.ts --name "api-backend" --interpreter bun
             
-            # Salvar configuração do PM2
-            pm2 save
-            
-            # Aguardar backend iniciar
-            echo "⏳ Aguardando backend inicializar..."
-            sleep 5
-            
-            # Reiniciar Nginx
-            echo "🔄 Reiniciando Nginx..."
-            sudo systemctl restart nginx
-            
-            echo "📊 Status dos serviços:"
-            pm2 status
-            echo ""
-            sudo systemctl status nginx --no-pager -l | head -10
-            
-            echo "✅ Deploy concluído com sucesso!"
+            cat > start-backend.sh << 'EOFSCRIPT'
+            #!/bin/bash
+            # Carregar variáveis de ambiente da raiz do projeto
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            source .env
+
+            # Exportar variáveis para o processo
+            export REACT_APP_AUTH0_DOMAIN
+            export REACT_APP_AUTH0_AUDIENCE
+            export AUTH0_DOMAIN
+            export AUTH0_AUDIENCE
+            export DATABASE_URL
+            export DB_HOST
+            export DB_USER
+            export DB_PASSWORD
+            export DB_NAME
+            export NODE_ENV
+            export PORT
+
+            # Navegar para o backend e iniciar
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
+            exec bun run server.ts
+            EOFSCRIPT
+                        
+                        chmod +x start-backend.sh
+                        
+                        # Iniciar backend com o script wrapper
+                        echo "🚀 Iniciando backend atualizado..."
+                        pm2 start start-backend.sh --name "api-backend" --interpreter bash
+                        
+                        # Salvar configuração do PM2
+                        pm2 save
+                        
+                        # Aguardar backend iniciar
+                        echo "⏳ Aguardando backend inicializar..."
+                        sleep 5
+                        
+                        # Reiniciar Nginx
+                        echo "🔄 Reiniciando Nginx..."
+                        sudo systemctl restart nginx
+                        
+                        echo "📊 Status dos serviços:"
+                        pm2 status
+                        echo ""
+                        sudo systemctl status nginx --no-pager -l | head -10
+                        
+                        echo "✅ Deploy concluído com sucesso!"
 
       # 8. Verificar saúde do site
       - name: 🏥 Health check
