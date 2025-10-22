@@ -37,7 +37,7 @@ export const ProductsApi = createApi({
       { productId: number }
     >({
       query: ({ productId }) => ({
-        url: `${endpoint}/products/${productId}`,
+        url: `${endpoint}/product/${productId}`,
         method: 'DELETE',
       }),
     }),

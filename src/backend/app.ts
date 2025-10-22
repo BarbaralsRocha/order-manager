@@ -5,6 +5,7 @@ import ordersRoutes from './routes/orderRoutes';
 import { ContentfulStatusCode } from 'hono/utils/http-status';
 import { authRouter } from './routes/authRoutes';
 import { authMiddleware } from './middleware/authMiddleware';
+import { errorHandler } from './middleware/errorMiddleware';
 
 const app = new Hono();
 
@@ -26,6 +27,9 @@ app.use('/api/*', async (c, next) => {
 
 // Rota pública para autenticação
 app.route('/api', authRouter);
+
+// Middleware de erro global
+app.use('*', errorHandler);
 
 // Rotas protegidas que requerem autenticação
 app.use('/api/*', authMiddleware);
