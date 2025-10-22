@@ -49,7 +49,7 @@ export class AuthService {
 
       // Obtém a chave pública correspondente ao kid
       const signingKey = await this.getSigningKey(decodedHeader.header.kid);
-
+      console.log({ signingKey });
       // Verifica o token com a chave pública
       const decoded = jwt.verify(token, signingKey, {
         audience: this.audience,
