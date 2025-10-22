@@ -6,7 +6,7 @@ import { worker } from './frontend/commons/mocks/browser';
 
 const enableMocking = async () => {
   if (process.env.REACT_APP_ENV_NAME === 'LOCAL') {
-    await worker.start();
+    // await worker.start();
   }
 };
 
