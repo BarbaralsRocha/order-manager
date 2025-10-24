@@ -12,8 +12,7 @@ jobs:
   deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: 'production'
+    
     steps:
       # 1. Checkout do código
       - name: 🔄 Checkout code
