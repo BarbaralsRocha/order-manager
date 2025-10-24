@@ -10,6 +10,7 @@ const redirectPath =
   process.env.NODE_ENV === 'production'
     ? process.env.REACT_APP_FRONTEND_URL
     : process.env.REACT_APP_FRONTEND_URL_HML;
+console.log({ redirectPath });
 const App: React.FC = () => {
   return (
     <Auth0Provider
