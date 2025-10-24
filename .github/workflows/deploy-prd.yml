@@ -1,0 +1,225 @@
+# .github/workflows/deploy-prod.yml
+
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "DEPLOY" to confirm production deployment'
+        required: true
+        default: ''
+
+jobs:
+  # Job de validação (opcional, mas recomendado)
+  validate:
+    name: Validate before deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm != 'DEPLOY'
+    steps:
+      - name: ❌ Deployment cancelled
+        run: |
+          echo "❌ Deploy cancelado: confirmação não fornecida"
+          echo "Por favor, digite 'DEPLOY' para confirmar"
+          exit 1
+
+  deploy:
+    name: Build and Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate]
+    if: always() && (needs.validate.result == 'skipped' || needs.validate.result == 'success')
+    environment: 
+      name: production
+      url: https://pedidosnicolina.com
+    
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install frontend dependencies
+        run: npm ci
+
+      - name: 🏗️ Build frontend
+        env:
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_API_URL: https://pedidosnicolina.com
+          REACT_APP_FRONTEND_URL: https://pedidosnicolina.com
+          CI: false
+        run: npm run build
+
+      - name: 📦 Create build archive
+        run: |
+          cd build
+          tar -czf ../build.tar.gz .
+          cd ..
+          ls -lh build.tar.gz
+
+      - name: 📤 Upload build to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build.tar.gz"
+          target: "/home/ubuntu/projects/ordermanager/order-manager/"
+          timeout: 10m
+
+      - name: 🚀 Deploy on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 10m
+          script: |
+            set -e
+            
+            echo "📂 Navegando para o diretório do projeto..."
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            
+            echo "📦 Extraindo build do frontend..."
+            if [ -d "build" ]; then
+              echo "💾 Criando backup do build anterior..."
+              mv build build.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            mkdir -p build
+            tar -xzf build.tar.gz -C build/
+            rm build.tar.gz
+            echo "✅ Frontend extraído com sucesso"
+            
+            echo "🔧 Atualizando backend..."
+            git pull origin main || echo "⚠️ Git pull falhou ou não há mudanças"
+            
+            echo "🔧 Configurando ambiente..."
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
+            
+            echo "🔐 Configurando variáveis de ambiente..."
+            cat > .env << 'EOF'
+            AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+            AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+            REACT_APP_AUTH0_DOMAIN=${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+            REACT_APP_AUTH0_AUDIENCE=${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+            DB_HOST=${{ secrets.DATABASE_HOST }}
+            DB_USER=${{ secrets.DATABASE_USER }}
+            DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            DB_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            PORT=4000
+            NODE_ENV=production
+            EOF
+            
+            echo "📦 Instalando dependências..."
+            bun install
+            
+            echo "🔧 Executando Prisma..."
+            bunx prisma generate
+            bunx prisma migrate deploy || echo "⚠️ Prisma migrate falhou ou não há migrations"
+            
+            echo "♻️ Reiniciando serviços..."
+            pm2 stop api-backend 2>/dev/null || true
+            pm2 delete api-backend 2>/dev/null || true
+            lsof -ti:4000 | xargs kill -9 2>/dev/null || true
+            sleep 2
+            
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
+            
+            cat > start-backend.sh << 'EOFSCRIPT'
+            #!/bin/bash
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            source .env
+            export REACT_APP_AUTH0_DOMAIN
+            export REACT_APP_AUTH0_AUDIENCE
+            export AUTH0_DOMAIN
+            export AUTH0_AUDIENCE
+            export DATABASE_URL
+            export DB_HOST
+            export DB_USER
+            export DB_PASSWORD
+            export DB_NAME
+            export NODE_ENV
+            export PORT
+            cd /home/ubuntu/projects/ordermanager/order-manager/src/backend
+            exec bun run server.ts
+            EOFSCRIPT
+            
+            chmod +x start-backend.sh
+            
+            echo "🚀 Iniciando backend atualizado..."
+            pm2 start start-backend.sh --name "api-backend" --interpreter bash
+            pm2 save
+            
+            sleep 5
+            
+            echo "🔄 Reiniciando Nginx..."
+            sudo systemctl restart nginx
+            
+            echo "📊 Status dos serviços:"
+            pm2 status
+            echo ""
+            sudo systemctl status nginx --no-pager -l | head -10
+            
+            echo "✅ Deploy concluído com sucesso!"
+
+      - name: 🏥 Health check
+        run: |
+          sleep 15
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://pedidosnicolina.com)
+          if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+            echo "✅ Site está no ar! (HTTP $response)"
+          else
+            echo "⚠️ Site retornou HTTP $response"
+            sleep 10
+            response=$(curl -s -o /dev/null -w "%{http_code}" https://pedidosnicolina.com)
+            if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+              echo "✅ Site está no ar na segunda tentativa! (HTTP $response)"
+            else
+              echo "❌ Site não está respondendo corretamente"
+              exit 1
+            fi
+          fi
+
+      - name: 🧹 Cleanup old builds
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/projects/ordermanager/order-manager
+            echo "🧹 Limpando builds antigos (mantendo últimos 3)..."
+            ls -t build.backup.* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+            echo "✅ Limpeza concluída"
+
+      - name: 🎉 Deployment complete
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Deploy PRODUÇÃO realizado com sucesso!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🌐 Frontend: https://pedidosnicolina.com"
+          echo "🔌 Backend API: https://pedidosnicolina.com/api"
+          echo "📊 Logs: ssh ubuntu@${{ secrets.REMOTE_HOST }} 'pm2 logs api-backend'"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: ❌ Deployment failed
+        if: failure()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌ Deploy PRODUÇÃO falhou!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Verifique os logs acima"
+          echo "🔍 Debug: ssh ubuntu@${{ secrets.REMOTE_HOST }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

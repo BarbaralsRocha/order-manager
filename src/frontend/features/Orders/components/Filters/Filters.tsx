@@ -109,7 +109,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     },
     [setFilters],
   );
-
+  // TODO: FAZER A BUSCA DOS CLIENTES E DOS PRODUTOS NO AUTOCOMPLETE FETCH
   return (
     <Box gap={1}>
       <Box>

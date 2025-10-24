@@ -1,0 +1,290 @@
+# .github/workflows/deploy-hml.yml
+
+name: Deploy to Homologation (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch para fazer deploy'
+        required: true
+        default: 'develop'
+        type: string
+      sync_database:
+        description: 'Sincronizar banco de dados da produção?'
+        required: true
+        default: false
+        type: boolean
+      confirm:
+        description: 'Digite "DEPLOY" para confirmar'
+        required: true
+        type: string
+
+jobs:
+  validate:
+    name: Validar confirmação
+    runs-on: ubuntu-latest
+    steps:
+      - name: ❌ Verificar confirmação
+        if: github.event.inputs.confirm != 'DEPLOY'
+        run: |
+          echo "❌ Deploy cancelado: você deve digitar 'DEPLOY' para confirmar"
+          exit 1
+
+  sync-database:
+    name: Sincronizar Database (Opcional)
+    runs-on: ubuntu-latest
+    needs: [validate]
+    if: github.event.inputs.sync_database == 'true'
+    steps:
+      - name: 🔄 Criar cópia do banco de produção
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 30m
+          script: |
+            set -e
+            
+            echo "🔐 Sincronizando banco de dados..."
+            echo "⚠️  ATENÇÃO: Isso vai SOBRESCREVER o banco de HML!"
+            
+            DB_PROD="${{ secrets.DATABASE_NAME }}"
+            DB_HML="${{ secrets.HML_DATABASE_NAME }}"
+            DB_USER="${{ secrets.DATABASE_USER }}"
+            DB_PASS="${{ secrets.DATABASE_PASSWORD }}"
+            
+            BACKUP_FILE="/tmp/prod_backup_$(date +%Y%m%d_%H%M%S).sql"
+            
+            echo "📦 Criando backup do banco de produção..."
+            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_PROD" > "$BACKUP_FILE"
+            
+            echo "📊 Tamanho do backup: $(du -h $BACKUP_FILE | cut -f1)"
+            
+            echo "🗑️  Dropando banco HML se existir..."
+            mysql -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS \`$DB_HML\`;"
+            
+            echo "🆕 Criando banco HML..."
+            mysql -u "$DB_USER" -p"$DB_PASS" -e "CREATE DATABASE \`$DB_HML\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            
+            echo "📥 Importando dados da produção para HML..."
+            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" < "$BACKUP_FILE"
+            
+            echo "🧹 Limpando backup temporário..."
+            rm "$BACKUP_FILE"
+            
+            echo "✅ Banco HML sincronizado com sucesso!"
+            echo "📊 Contando registros..."
+            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" -e "
+              SELECT 
+                (SELECT COUNT(*) FROM Customer) as total_customers,
+                (SELECT COUNT(*) FROM \`Order\`) as total_orders;
+            "
+
+  deploy:
+    name: Build and Deploy to HML
+    runs-on: ubuntu-latest
+    needs: [validate, sync-database]
+    if: always() && needs.validate.result == 'success' && (needs.sync-database.result == 'success' || needs.sync-database.result == 'skipped')
+    environment: homologation
+    
+    steps:
+      # 1. Checkout da branch especificada
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      # 2. Setup Node.js
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Instalar dependências
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # 4. Build do frontend para HML
+      - name: 🏗️ Build frontend (HML)
+        env:
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.HML_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.HML_AUTH0_CLIENT_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.HML_AUTH0_AUDIENCE }}
+          REACT_APP_API_URL: https://hml.pedidosnicolina.com
+          REACT_APP_FRONTEND_URL: https://hml.pedidosnicolina.com
+          CI: false
+        run: npm run build
+
+      # 5. Criar arquivo compactado
+      - name: 📦 Create build archive
+        run: |
+          cd build
+          tar -czf ../build-hml.tar.gz .
+          cd ..
+          echo "✅ Build criado: $(du -h build-hml.tar.gz | cut -f1)"
+
+      # 6. Enviar para VM
+      - name: 📤 Upload build to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build-hml.tar.gz"
+          target: "/home/ubuntu/projects/ordermanager/order-manager-hml/"
+          timeout: 10m
+
+      # 7. Deploy na VM
+      - name: 🚀 Deploy on VM (HML)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 10m
+          script: |
+            set -e
+            
+            echo "📂 Navegando para HML..."
+            cd /home/ubuntu/projects/ordermanager/order-manager-hml
+            
+            echo "📦 Extraindo build..."
+            if [ -d "build" ]; then
+              echo "💾 Backup do build anterior..."
+              mv build build.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            mkdir -p build
+            tar -xzf build-hml.tar.gz -C build/
+            rm build-hml.tar.gz
+            
+            echo "🔧 Atualizando código backend..."
+            git fetch origin
+            git checkout ${{ github.event.inputs.branch }}
+            git pull origin ${{ github.event.inputs.branch }}
+            
+            echo "Branch atual: $(git branch --show-current)"
+            echo "Último commit: $(git log -1 --oneline)"
+            
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:/usr/local/bin:$HOME/.nvm/versions/node/v22.20.0/bin:$PATH"
+            
+            echo "🔐 Configurando .env HML..."
+            cat > .env << 'EOF'
+            AUTH0_DOMAIN=${{ secrets.HML_AUTH0_DOMAIN }}
+            AUTH0_AUDIENCE=${{ secrets.HML_AUTH0_AUDIENCE }}
+            REACT_APP_AUTH0_DOMAIN=${{ secrets.HML_AUTH0_DOMAIN }}
+            REACT_APP_AUTH0_AUDIENCE=${{ secrets.HML_AUTH0_AUDIENCE }}
+            DB_HOST=${{ secrets.HML_DATABASE_HOST }}
+            DB_USER=${{ secrets.HML_DATABASE_USER }}
+            DB_PASSWORD=${{ secrets.HML_DATABASE_PASSWORD }}
+            DB_NAME=${{ secrets.HML_DATABASE_NAME }}
+            DATABASE_URL=${{ secrets.HML_DATABASE_URL }}
+            PORT=4001
+            NODE_ENV=homologation
+            EOF
+            
+            echo "📦 Instalando dependências..."
+            bun install
+            
+            echo "🔧 Executando Prisma..."
+            bunx prisma generate
+            bunx prisma migrate deploy || echo "⚠️ Nenhuma migration pendente"
+            
+            echo "♻️ Reiniciando backend HML..."
+            pm2 stop api-backend-hml 2>/dev/null || true
+            pm2 delete api-backend-hml 2>/dev/null || true
+            lsof -ti:4001 | xargs kill -9 2>/dev/null || true
+            sleep 2
+            
+            cd /home/ubuntu/projects/ordermanager/order-manager-hml/src/backend
+            
+            cat > start-backend-hml.sh << 'EOFSCRIPT'
+            #!/bin/bash
+            cd /home/ubuntu/projects/ordermanager/order-manager-hml
+            source .env
+            export REACT_APP_AUTH0_DOMAIN
+            export REACT_APP_AUTH0_AUDIENCE
+            export AUTH0_DOMAIN
+            export AUTH0_AUDIENCE
+            export DATABASE_URL
+            export DB_HOST
+            export DB_USER
+            export DB_PASSWORD
+            export DB_NAME
+            export NODE_ENV
+            export PORT
+            cd /home/ubuntu/projects/ordermanager/order-manager-hml/src/backend
+            exec bun run server.ts
+            EOFSCRIPT
+            
+            chmod +x start-backend-hml.sh
+            
+            echo "🚀 Iniciando backend HML..."
+            pm2 start start-backend-hml.sh --name "api-backend-hml" --interpreter bash
+            pm2 save
+            
+            sleep 5
+            
+            echo "🔄 Reiniciando Nginx..."
+            sudo systemctl restart nginx
+            
+            echo "📊 Status HML:"
+            pm2 describe api-backend-hml | grep -E "status|uptime|restarts"
+            
+            echo ""
+            echo "✅ Deploy HML concluído!"
+            echo "🌿 Branch: ${{ github.event.inputs.branch }}"
+            echo "🗄️  Database sync: ${{ github.event.inputs.sync_database }}"
+
+      # 8. Health check
+      - name: 🏥 Health check HML
+        run: |
+          echo "⏳ Aguardando 15 segundos..."
+          sleep 15
+          
+          echo "🔍 Verificando HML..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://hml.pedidosnicolina.com)
+          
+          if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+            echo "✅ HML está no ar! (HTTP $response)"
+          else
+            echo "⚠️ HML retornou HTTP $response"
+            echo "Tentando novamente..."
+            sleep 10
+            response=$(curl -s -o /dev/null -w "%{http_code}" https://hml.pedidosnicolina.com)
+            if [ $response -eq 200 ] || [ $response -eq 301 ] || [ $response -eq 302 ]; then
+              echo "✅ HML no ar na segunda tentativa!"
+            else
+              echo "❌ HML não está respondendo"
+              exit 1
+            fi
+          fi
+
+      # 9. Resumo do deploy
+      - name: 🎉 Deploy Summary
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Deploy HML realizado com sucesso!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🌿 Branch: ${{ github.event.inputs.branch }}"
+          echo "🗄️  Database sincronizado: ${{ github.event.inputs.sync_database }}"
+          echo "🌐 Frontend: https://hml.pedidosnicolina.com"
+          echo "🔌 API: https://hml.pedidosnicolina.com/api"
+          echo "📊 Logs: ssh ubuntu@${{ secrets.REMOTE_HOST }} 'pm2 logs api-backend-hml'"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: ❌ Deploy Failed
+        if: failure()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌ Deploy HML falhou!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Verifique os logs acima"
+          echo "🔍 Debug: ssh ubuntu@${{ secrets.REMOTE_HOST }}"
+          echo "📊 PM2: pm2 logs api-backend-hml"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
