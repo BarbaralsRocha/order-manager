@@ -44,6 +44,4 @@ customerRoutes.delete('/customer/:id', customerController.deleteCustomer);
 
 export default customerRoutes;
 
-// TODO: Adicionar paginação na listagem de clientes
-// TODO: Adicionar filtro de busca por nome ou CPF/CNPJ do cliente
 // TODO: Impressão da lista de clientes
