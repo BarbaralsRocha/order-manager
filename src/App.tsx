@@ -6,14 +6,17 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import { store } from './frontend/commons/redux/store';
 import { Auth0Provider } from '@auth0/auth0-react';
-
+const redirectPath =
+  process.env.NODE_ENV === 'production'
+    ? process.env.REACT_APP_FRONTEND_URL
+    : process.env.REACT_APP_FRONTEND_URL_HML;
 const App: React.FC = () => {
   return (
     <Auth0Provider
       domain={process.env.REACT_APP_AUTH0_DOMAIN || ''}
       clientId={process.env.REACT_APP_AUTH0_CLIENT_ID || ''}
       authorizationParams={{
-        redirect_uri: `${process.env.REACT_APP_FRONTEND_URL}/callback`,
+        redirect_uri: `${redirectPath}/callback`,
         audience: process.env.REACT_APP_AUTH0_AUDIENCE,
       }}
     >
