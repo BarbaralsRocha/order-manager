@@ -41,7 +41,6 @@ export const createOrder = async (orderData: ICreateOrder) => {
       include: { orderDetails: { include: { product: true } }, customer: true },
     });
   } catch (error) {
-    console.log({ error });
     throw new Error('Failed to create order.');
   }
 };
@@ -169,7 +168,6 @@ export const updateOrder = async (orderId: number, orderData: ICreateOrder) => {
       });
     });
   } catch (error) {
-    console.log({ error });
     throw new Error('Failed to update order.');
   }
 };

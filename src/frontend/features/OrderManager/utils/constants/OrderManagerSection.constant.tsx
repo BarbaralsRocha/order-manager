@@ -14,6 +14,7 @@ import ProductRegister from '../../../Products/components/ProductRegister';
 import validationSchemaProducts from '../../../Products/components/ProductRegister/validationSchemaProducts';
 import { INITIAL_VALUES_PRODUCTS } from '../../../Products/utils/constants/Products.constants';
 import CustomersRegister from '../../../Customers/components/CustomersRegister';
+import { INITIAL_VALUES_CUSTOMER } from '../../../Customers/constants/InitialValuesCustomerRegister.constant';
 
 export const ColumnItems: {
   id: OrderManagerSectionType;
@@ -59,7 +60,7 @@ export const ConfigButton: Record<
   customers: {
     label: 'ADICIONAR CLIENTE',
     titleRegister: 'Cadastro de cliente',
-    initialValues: {},
+    initialValues: INITIAL_VALUES_CUSTOMER,
     validationSchema: validationSchemaCustomer,
     component: <CustomersRegister />,
   },

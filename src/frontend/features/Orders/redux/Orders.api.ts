@@ -3,7 +3,10 @@ import { baseQuery } from '../../../commons/redux/baseQuery';
 import { ContractResponse } from '../../../commons/interfaces/IMockContract';
 import { IOrder } from '../interfaces/IOrder.interface';
 import { ITotalProducts } from '../interfaces/ITotalProducts.interface';
-import { ICustomer } from '../../Customers/interfaces/ICustomer';
+import {
+  ICustomer,
+  ICustomerResponse,
+} from '../../Customers/interfaces/ICustomer';
 import { downloadFile } from '../../../../utils/downloadFile';
 
 const endpoint = '/api';
@@ -25,7 +28,7 @@ export const OrdersApi = createApi({
         }),
       },
     ),
-    getCustomerList: builder.query<ContractResponse<ICustomer[]>, void>({
+    getCustomerList: builder.query<ContractResponse<ICustomerResponse>, void>({
       query: () => ({
         url: `${endpoint}/customers`,
       }),

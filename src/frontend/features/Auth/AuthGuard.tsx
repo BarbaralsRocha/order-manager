@@ -23,7 +23,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         try {
           // Obter token do Auth0
           const token = await getAccessTokenSilently();
-          console.log('Obtained Auth0 token:', token);
           // Atualizar estado Redux
           dispatch(setCredentials({ token }));
 

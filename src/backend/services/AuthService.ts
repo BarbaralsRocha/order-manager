@@ -38,7 +38,6 @@ export class AuthService {
     try {
       // Decodifica o token sem verificar para obter o kid
       const decodedHeader = jwt.decode(token, { complete: true });
-      console.log('Decoded token header:', decodedHeader);
       if (
         !decodedHeader ||
         typeof decodedHeader === 'string' ||
@@ -49,7 +48,6 @@ export class AuthService {
 
       // Obtém a chave pública correspondente ao kid
       const signingKey = await this.getSigningKey(decodedHeader.header.kid);
-      console.log({ signingKey });
       // Verifica o token com a chave pública
       const decoded = jwt.verify(token, signingKey, {
         audience: this.audience,

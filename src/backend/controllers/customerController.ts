@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ICustomer } from '../interfaces/Customer.interface';
 import { createCustomerSchema } from '../schemas/customerControllerSchema';
 import * as CustomerService from '../services/customerService';
 import { Context } from 'hono';
-import * as yup from 'yup';
 import { handleError } from '../utils/handleErrors';
+import {
+  DuplicateCnpjError,
+  ValidationFormCustomerError,
+} from '../handleErrors/customerErrors';
 
 export const createCustomer = async (c: Context) => {
   try {
@@ -14,8 +18,9 @@ export const createCustomer = async (c: Context) => {
       address,
       cnpj,
       stateRegistration,
+      isStateRegistrationExempt,
       phoneNumber,
-    } = await c.req.json();
+    } = await c.req.json<ICustomer>();
 
     const body = {
       name,
@@ -24,28 +29,52 @@ export const createCustomer = async (c: Context) => {
       address,
       cnpj,
       stateRegistration,
+      isStateRegistrationExempt,
       phoneNumber,
     };
 
     try {
-      await createCustomerSchema.validate(body, {
-        abortEarly: false,
-      });
+      await createCustomerSchema
+        .validate(body, { abortEarly: false })
+        .catch((err) => {
+          throw new ValidationFormCustomerError(err);
+        });
       const newCustomer = await CustomerService.createCustomer(body);
       return c.json({ output: newCustomer }, 201);
-    } catch (validationError) {
-      const errors = (validationError as yup.ValidationError).errors;
-      return c.json({ validationResult: errors }, 400);
+    } catch (error) {
+      if (error instanceof DuplicateCnpjError) {
+        return c.json({ validationResult: error.errors }, 409);
+      }
+      if (error instanceof ValidationFormCustomerError) {
+        return c.json({ validationResult: error.errors }, 400);
+      }
     }
   } catch (error) {
-    return handleError(c, error, 'Failed to create customer');
+    return handleError(c, error, 'Falha ao criar cliente');
   }
 };
 
 export const getAllCustomers = async (c: Context) => {
   try {
-    const customers = await CustomerService.getAllCustomers();
-    return c.json({ output: customers }, 200);
+    // Captura os query params
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = parseInt(c.req.query('limit') || '20');
+    const name = c.req.query('name') || undefined;
+    const cnpj = c.req.query('cnpj') || undefined;
+
+    // Validações básicas
+    if (page < 1 || limit < 1) {
+      return c.json({ error: 'Page and limit must be greater than 0' }, 400);
+    }
+
+    const result = await CustomerService.getAllCustomers({
+      page,
+      limit,
+      name,
+      cnpj,
+    });
+
+    return c.json({ output: result }, 200);
   } catch (error) {
     return handleError(c, error, 'Failed to fetch customers');
   }

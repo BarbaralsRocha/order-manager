@@ -74,7 +74,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
       [] as IOptionSelect[],
     );
 
-    const formartListCustomers = currentDataCustomers?.output.reduce(
+    const formartListCustomers = currentDataCustomers?.output.data?.reduce(
       (acc, value) => {
         const format = {
           id: value.id as number,

@@ -43,11 +43,12 @@ model Customer {
   additionalInformation String? @db.VarChar(255)  
   address            String    @db.VarChar(255) 
   cnpj               String    @unique @db.VarChar(18)
-  stateRegistration  String    @db.VarChar(20)
+  stateRegistration  String?   @db.VarChar(20)
   phoneNumber        String    @db.VarChar(20) 
   updatedAt         DateTime  @default(now()) @updatedAt
   createdAt          DateTime  @default(now())
   orders             Order[]   
+  isStateRegistrationExempt   Boolean  @default(false)
 }
 
 model Order {

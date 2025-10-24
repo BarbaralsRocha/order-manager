@@ -95,11 +95,11 @@ export default function ControlledAccordions() {
       <Typography sx={{ p: 2, paddingLeft: 0, paddingTop: 0 }} variant="h6">
         Dados dos clientes
       </Typography>
-      {currentData?.output.map((customer) => (
+      {currentData?.output.data?.map((customer) => (
         <Accordion
           key={customer.id}
           expanded={expanded === customer.id}
-          onChange={handleChange(customer.id)}
+          onChange={handleChange(customer.id!)}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -181,7 +181,11 @@ export default function ControlledAccordions() {
               <Grid item component="div" lg={4} xl={4} md={4}>
                 <RenderInfoColumn
                   label="Inscrição estadual"
-                  value={formatIE(customer.stateRegistration)}
+                  value={
+                    customer.stateRegistration
+                      ? formatIE(customer.stateRegistration)
+                      : '-'
+                  }
                 />
               </Grid>
               <Grid item component="div" lg={4} xl={4} md={4}>

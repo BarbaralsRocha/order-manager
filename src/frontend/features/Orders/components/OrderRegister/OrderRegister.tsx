@@ -66,7 +66,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   const { handleCloseDrawer } = useDrawer();
   const { insertRegister, handleRemoveRegister } = useRegister();
   const [listCustomers, setListCustomers] = useState<
-    { id: number; label: string }[] | undefined
+    { id?: number; label: string }[] | undefined
   >([]);
   const [listProducts, setListProducts] = useState<
     { id: number; label: string }[] | undefined
@@ -104,7 +104,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   });
 
   useEffect(() => {
-    const formartList = currentDataCustomer?.output.reduce(
+    const formartList = currentDataCustomer?.output.data?.reduce(
       (acc, value) => {
         const format = {
           id: value.id,
@@ -113,7 +113,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
         acc.push(format);
         return acc;
       },
-      [] as { id: number; label: string }[],
+      [] as { id?: number; label: string }[],
     );
     setListCustomers(formartList);
   }, [currentDataCustomer]);

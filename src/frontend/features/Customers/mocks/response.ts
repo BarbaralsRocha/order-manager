@@ -7,7 +7,8 @@ export const responseCustomer = (): ICustomer[] => [
     address: 'Address 1',
     phoneNumber: '123456789',
     cnpj: '12345678912345',
-    stateRegistration: '123456789',
+    stateRegistration: null,
+    isStateRegistrationExempt: false,
     fantasyName: 'Fantasy Name 1',
   },
   {
@@ -17,6 +18,7 @@ export const responseCustomer = (): ICustomer[] => [
     phoneNumber: '123456789',
     cnpj: '12345678912345',
     stateRegistration: '123456789',
+    isStateRegistrationExempt: true,
     fantasyName: 'Fantasy Name 1',
   },
 ];

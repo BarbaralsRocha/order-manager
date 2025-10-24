@@ -40,6 +40,7 @@ export const responseOrders = (): IOrder[] => [
       address: 'teste',
       cnpj: '12345678000122',
       stateRegistration: '12345678',
+      isStateRegistrationExempt: false,
       phoneNumber: '11123456789',
       updatedAt: '2024-12-09T15:17:49.443Z',
       createdAt: '2024-12-09T16:36:43.289Z',

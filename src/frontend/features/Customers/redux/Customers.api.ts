@@ -1,7 +1,10 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '../../../commons/redux/baseQuery';
 import { ContractResponse } from '../../../commons/interfaces/IMockContract';
-import { ICustomer } from '../../Customers/interfaces/ICustomer';
+import {
+  ICustomer,
+  ICustomerResponse,
+} from '../../Customers/interfaces/ICustomer';
 
 const endpoint = '/api';
 
@@ -10,7 +13,7 @@ export const OrdersApi = createApi({
   baseQuery,
   refetchOnMountOrArgChange: true,
   endpoints: (builder) => ({
-    getCustomerList: builder.query<ContractResponse<ICustomer[]>, void>({
+    getCustomerList: builder.query<ContractResponse<ICustomerResponse>, void>({
       query: () => ({
         url: `${endpoint}/customers`,
       }),
