@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
+import { env } from 'process';
 
 const LoginPage: React.FC = () => {
   const { loginWithRedirect, isAuthenticated } = useAuth0();
@@ -11,7 +12,7 @@ const LoginPage: React.FC = () => {
       ? process.env.REACT_APP_FRONTEND_URL
       : process.env.REACT_APP_FRONTEND_URL_HML;
 
-  console.log({ redirectPath });
+  console.log({ redirectPath, env: process.env.NODE_ENV });
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
