@@ -38,6 +38,7 @@ jobs:
           REACT_APP_API_URL: https://pedidosnicolina.com
           REACT_APP_FRONTEND_URL: https://pedidosnicolina.com
           CI: false
+          NODE_ENV: 'production'
         run: npm run build
 
       # 5. Criar arquivo compactado do build

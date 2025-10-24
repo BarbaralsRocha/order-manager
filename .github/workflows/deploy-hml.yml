@@ -88,6 +88,8 @@ jobs:
     needs: [validate, sync-database]
     if: always() && needs.validate.result == 'success' && (needs.sync-database.result == 'success' || needs.sync-database.result == 'skipped')
     environment: homologation
+    env:
+      NODE_ENV: 'homologation'
     
     steps:
       # 1. Checkout da branch especificada
