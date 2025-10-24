@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
           variant="contained"
           sx={{ mt: 3 }}
         >
-          Login com Auth0
+          Login HML com Auth0
         </Button>
       </Box>
     </Container>
