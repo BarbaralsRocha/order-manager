@@ -6,10 +6,15 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage: React.FC = () => {
   const { loginWithRedirect, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
+  const redirectPath =
+    process.env.NODE_ENV === 'production'
+      ? process.env.REACT_APP_FRONTEND_URL
+      : process.env.REACT_APP_FRONTEND_URL_HML;
 
+  console.log({ redirectPath });
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
