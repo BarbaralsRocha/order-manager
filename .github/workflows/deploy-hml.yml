@@ -134,7 +134,7 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "build-hml.tar.gz"
-          target: "/home/ubuntu/projects/ordermanager/order-manager-hml/"
+          target: "/home/ubuntu/projects/ordermanagerhml/order-manager-hml/"
           timeout: 10m
 
       # 7. Deploy na VM
@@ -149,7 +149,7 @@ jobs:
             set -e
             
             echo "📂 Navegando para HML..."
-            cd /home/ubuntu/projects/ordermanager/order-manager-hml
+            cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml
             
             echo "📦 Extraindo build..."
             if [ -d "build" ]; then
@@ -200,11 +200,11 @@ jobs:
             lsof -ti:4001 | xargs kill -9 2>/dev/null || true
             sleep 2
             
-            cd /home/ubuntu/projects/ordermanager/order-manager-hml/src/backend
+            cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml/src/backend
             
             cat > start-backend-hml.sh << 'EOFSCRIPT'
             #!/bin/bash
-            cd /home/ubuntu/projects/ordermanager/order-manager-hml
+            cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml
             source .env
             export REACT_APP_AUTH0_DOMAIN
             export REACT_APP_AUTH0_AUDIENCE
@@ -217,7 +217,7 @@ jobs:
             export DB_NAME
             export NODE_ENV
             export PORT
-            cd /home/ubuntu/projects/ordermanager/order-manager-hml/src/backend
+            cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml/src/backend
             exec bun run server.ts
             EOFSCRIPT
             
