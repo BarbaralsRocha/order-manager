@@ -183,6 +183,7 @@ jobs:
             DB_PASSWORD=${{ secrets.HML_DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.HML_DATABASE_NAME }}
             DATABASE_URL=${{ secrets.HML_DATABASE_URL }}
+            REACT_APP_FRONTEND_URL=${{ secrets.REACT_APP_FRONTEND_URL_HML }}
             PORT=4001
             NODE_ENV=homologation
             EOF
@@ -217,6 +218,7 @@ jobs:
             export DB_NAME
             export NODE_ENV
             export PORT
+            export REACT_APP_FRONTEND_URL
             cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml/src/backend
             exec bun run server.ts
             EOFSCRIPT
