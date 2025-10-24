@@ -118,7 +118,7 @@ jobs:
           REACT_APP_API_URL: https://hml.pedidosnicolina.com
           REACT_APP_FRONTEND_URL: https://hml.pedidosnicolina.com
           CI: false
-        run: npm run build
+        run: NODE_ENV=homologation npm run build
 
       # 5. Criar arquivo compactado
       - name: 📦 Create build archive
