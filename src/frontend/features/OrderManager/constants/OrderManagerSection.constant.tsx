@@ -6,15 +6,15 @@ import {
   OrderManagerSectionValue,
 } from '../types/OrderManagerSection.type';
 import type * as Yup from 'yup';
-import validationSchemaCustomer from '../../../Customers/components/CustomersContainer/validationSchemaCustomer';
-import { INITIAL_VALUES_ORDERS } from '../../../Orders/utils/constants/Order.constant';
-import validationSchemaOrders from '../../../Orders/components/OrderRegister/validationSchemaOrders';
-import OrderRegister from '../../../Orders/components/OrderRegister';
-import ProductRegister from '../../../Products/components/ProductRegister';
-import validationSchemaProducts from '../../../Products/components/ProductRegister/validationSchemaProducts';
-import { INITIAL_VALUES_PRODUCTS } from '../../../Products/utils/constants/Products.constants';
-import CustomersRegister from '../../../Customers/components/CustomersRegister';
-import { INITIAL_VALUES_CUSTOMER } from '../../../Customers/constants/InitialValuesCustomerRegister.constant';
+import { INITIAL_VALUES_CUSTOMER } from '../../Customers/constants/InitialValuesCustomerRegister.constant';
+import validationSchemaCustomer from '../../Customers/components/CustomersContainer/validationSchemaCustomer';
+import CustomersRegister from '../../Customers/components/CustomersRegister';
+import { INITIAL_VALUES_ORDERS } from '../../Orders/constants/Order.constant';
+import validationSchemaOrders from '../../Orders/components/OrderRegister/validationSchemaOrders';
+import OrderRegister from '../../Orders/components/OrderRegister';
+import { INITIAL_VALUES_PRODUCTS } from '../../Products/utils/constants/Products.constants';
+import validationSchemaProducts from '../../Products/components/ProductRegister/validationSchemaProducts';
+import ProductRegister from '../../Products/components/ProductRegister';
 
 export const ColumnItems: {
   id: OrderManagerSectionType;

@@ -1,14 +1,14 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import OrderList from '../OrderList';
-import { OrdersEnum } from '../../utils/enum/Order.enum';
+import { OrdersEnum } from '../../enum/Order.enum';
 import { useMemo, useState } from 'react';
-import { OrderSectionType } from '../../utils/types/Order.type';
+import { OrderSectionType } from '../../types/Order.type';
 import OrderCustomers from '../OrderCustomers';
 import OrderProducts from '../OrderProducts';
 import {
   INITIAL_VALUES_FILTERS,
   OrderSection,
-} from '../../utils/constants/Order.constant';
+} from '../../constants/Order.constant';
 import objetToQueryString from '../../../../../utils/queryString';
 import Filters from '../Filters';
 import OrderManager from '../OrderManager';

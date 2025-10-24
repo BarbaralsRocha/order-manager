@@ -14,7 +14,7 @@ import {
   responseOrders,
   responseProducts,
 } from '../../../Orders/mocks/response';
-import { INITIAL_VALUES_ORDERS } from '../../../Orders/utils/constants/Order.constant';
+import { INITIAL_VALUES_ORDERS } from '../../../Orders/constants/Order.constant';
 import {
   useGetCustomerListQuery,
   useSendOrderMutation,

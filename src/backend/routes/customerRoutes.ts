@@ -26,6 +26,7 @@ customerRoutes.get('/customers', customerController.getAllCustomers);
  * @route PUT /customer/:id
  * Edge Case: Se o cliente não existir, retornar erro 404
  * Edge Case: Se os dados do cliente forem inválidos, retornar erro 400 (Validação do formulário)
+ * Edge Case: Se o novo CNPJ já estiver cadastrado para outro cliente, retornar erro 409
  * Edge Case: Se o cliente for atualizado com sucesso, retornar o cliente atualizado com status 200
  * Edge Case: Se houver um erro no servidor, retornar erro 500
  */

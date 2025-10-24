@@ -9,10 +9,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useTheme } from '@mui/material/styles';
-import { ColumnItems } from '../../utils/constants/OrderManagerSection.constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { ManageOrdersActions } from '../../redux/slices/ManageOrders.slice';
 import { RootState } from '../../../../commons/redux/store';
+import { ColumnItems } from '../../constants/OrderManagerSection.constant';
 
 const drawerWidth = 240;
 

@@ -5,6 +5,7 @@ import {
   ICustomer,
   ICustomerResponse,
 } from '../../Customers/interfaces/ICustomer';
+import { IFiltersCustomers } from '../interfaces/FiltersCustomers.interface';
 
 const endpoint = '/api';
 
@@ -13,11 +14,13 @@ export const OrdersApi = createApi({
   baseQuery,
   refetchOnMountOrArgChange: true,
   endpoints: (builder) => ({
-    getCustomerList: builder.query<ContractResponse<ICustomerResponse>, void>({
-      query: () => ({
-        url: `${endpoint}/customers`,
-      }),
-    }),
+    getCustomerList: builder.query<ContractResponse<ICustomerResponse>, string>(
+      {
+        query: (filters) => ({
+          url: `${endpoint}/customers?${filters}`,
+        }),
+      },
+    ),
     addCustomer: builder.mutation<ContractResponse<boolean>, ICustomer>({
       query: (customer: ICustomer) => ({
         url: `${endpoint}/customer`,

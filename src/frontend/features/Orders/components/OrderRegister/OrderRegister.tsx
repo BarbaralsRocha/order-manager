@@ -26,7 +26,7 @@ import {
   useGetCustomerListQuery,
   useSendOrderMutation,
 } from '../../redux/Orders.api';
-import { INITIAL_VALUES_PRODUCT_ORDER } from '../../utils/constants/Order.constant';
+import { INITIAL_VALUES_PRODUCT_ORDER } from '../../constants/Order.constant';
 import useRegister from '../../hooks/useRegister';
 import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
 import EmptyState from '../../../../commons/components/EmptyState';

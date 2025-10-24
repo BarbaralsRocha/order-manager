@@ -2,7 +2,7 @@
 import { fireEvent, render } from '@testing-library/react';
 import OrderRegister from '.';
 import { Formik, FormikConfig } from 'formik';
-import { INITIAL_VALUES_ORDERS } from '../../utils/constants/Order.constant';
+import { INITIAL_VALUES_ORDERS } from '../../constants/Order.constant';
 import {
   useGetCustomerListQuery,
   useSendOrderMutation,

@@ -1,20 +1,20 @@
 import { useSelector } from 'react-redux';
-import Menu from '../components/Menu';
+import Menu from '../Menu';
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import * as S from './OrderManagerContainer.style';
 import {
   ConfigButton,
   ManageOrders,
-} from '../utils/constants/OrderManagerSection.constant';
-import { ManageOrdersEnum } from '../utils/enums/ManageOrders.enum';
+} from '../../constants/OrderManagerSection.constant';
+import { ManageOrdersEnum } from '../../enums/ManageOrders.enum';
 import { useMemo } from 'react';
-import CustomersContainer from '../../Customers/components/CustomersContainer';
+import CustomersContainer from '../../../Customers/components/CustomersContainer';
 import { Add } from '@mui/icons-material';
-import useDrawer from '../../../commons/hooks/useDrawer';
-import FormFormik from '../../../commons/components/FormFormik';
-import ProductsContainer from '../../Products/components/ProductsContainer';
-import { RootState } from '../../../commons/redux/store';
-import OrdersContainer from '../../Orders/components/OrdersContainer';
+import useDrawer from '../../../../commons/hooks/useDrawer';
+import FormFormik from '../../../../commons/components/FormFormik';
+import ProductsContainer from '../../../Products/components/ProductsContainer';
+import { RootState } from '../../../../commons/redux/store';
+import OrdersContainer from '../../../Orders/components/OrdersContainer';
 
 const drawerWidth = 240;
 

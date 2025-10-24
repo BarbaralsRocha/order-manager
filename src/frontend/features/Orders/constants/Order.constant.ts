@@ -2,7 +2,7 @@ import {
   IFilters,
   IOrder,
   IProductOrder,
-} from '../../interfaces/IOrder.interface';
+} from '../interfaces/IOrder.interface';
 import { OrderSectionType, OrderSectionValue } from '../types/Order.type';
 
 export const OrderSection: Record<OrderSectionType, OrderSectionValue> = {

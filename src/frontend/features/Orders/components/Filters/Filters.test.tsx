@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import Filters from './Filters';
-import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';
+import { INITIAL_VALUES_FILTERS } from '../../constants/Order.constant';
 
 test('renders Filters', () => {
   render(

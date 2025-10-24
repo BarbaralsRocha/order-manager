@@ -4,7 +4,7 @@ import {
   Routes,
   BrowserRouter as Router,
 } from 'react-router-dom';
-import OrderManagerContainer from './frontend/features/OrderManager/OrderManagerContainer';
+import OrderManagerContainer from './frontend/features/OrderManager/components/OrderManagerContainer';
 import DrawerContainer from './frontend/commons/components/DrawerContainer';
 import SnackbarContainer from './frontend/commons/components/SnackbarContainer';
 import ModalContainer from './frontend/commons/components/ModalContainer';

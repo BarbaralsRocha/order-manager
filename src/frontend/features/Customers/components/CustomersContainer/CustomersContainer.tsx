@@ -14,6 +14,10 @@ import {
   Typography,
   Grid,
   IconButton,
+  Pagination,
+  PaginationItem,
+  Link,
+  TablePagination,
 } from '@mui/material';
 import {
   formatCNPJ,
@@ -32,6 +36,10 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import useModal from '../../../../commons/hooks/useModal';
 import DeleteConfirmation from '../../../../commons/components/DeleteConfirmation';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
+import { de } from 'zod/v4/locales';
+import { IFiltersCustomers } from '../../interfaces/FiltersCustomers.interface';
+import { INITIAL_VALUES_CUSTOMER_FILTERS } from '../../constants/InitialValuesCustomerFilters.constant';
+import objetToQueryString from '../../../../../utils/queryString';
 
 interface IPropsRenderInfoColumn {
   label: string;
@@ -52,9 +60,13 @@ const RenderInfoColumn: React.FC<IPropsRenderInfoColumn> = ({
   );
 };
 
-export default function ControlledAccordions() {
+const CustomerContainer: React.FC = () => {
+  const [filters, setFilters] = React.useState<IFiltersCustomers>(
+    INITIAL_VALUES_CUSTOMER_FILTERS,
+  );
+  const query = objetToQueryString(filters);
   const { currentData, isFetching, isError, refetch } =
-    useGetCustomerListQuery();
+    useGetCustomerListQuery(query);
   const { setComponentAtDrawer } = useDrawer();
   const { handleOpenModal, handleCloseModal } = useModal();
   const dispatch = useDispatch();
@@ -82,6 +94,23 @@ export default function ControlledAccordions() {
     },
   });
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setFilters((prev) => ({ ...prev, page: newPage + 1 }));
+  };
+  console.log(filters);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      limit: parseInt(event.target.value),
+      page: 1,
+    }));
+  };
+
   if (isFetching) {
     return <OrderListSkeleton />;
   }
@@ -89,7 +118,7 @@ export default function ControlledAccordions() {
   if (isError) {
     return <ServiceFail refetch={refetch} />;
   }
-
+  //TODO: IMPLEMENTAR PAGINACAO E FILTROS
   return (
     <Box sx={{ p: 3, gap: 3 }}>
       <Typography sx={{ p: 2, paddingLeft: 0, paddingTop: 0 }} variant="h6">
@@ -198,6 +227,17 @@ export default function ControlledAccordions() {
           </AccordionDetails>
         </Accordion>
       ))}
+      <TablePagination
+        component="div"
+        count={currentData?.output.pagination.total || 0}
+        page={filters.page - 1}
+        onPageChange={handleChangePage}
+        rowsPerPage={filters.limit}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="Linhas por página"
+      />
     </Box>
   );
-}
+};
+
+export default CustomerContainer;

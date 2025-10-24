@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { OrderManagerSectionType } from '../../utils/types/OrderManagerSection.type';
+import { OrderManagerSectionType } from '../../types/OrderManagerSection.type';
 
 const initialState = {
   currentMenuSelected: 'orders' as OrderManagerSectionType,

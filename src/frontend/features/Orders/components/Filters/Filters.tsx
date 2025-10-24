@@ -24,7 +24,7 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import SkeletonComponent from '../../../../commons/components/SkeletonComponent';
 import { useGetProductsQuery } from '../../../Products/redux/Products.api';
 import { IFilters } from '../../interfaces/IOrder.interface';
-import { INITIAL_VALUES_FILTERS } from '../../utils/constants/Order.constant';
+import { INITIAL_VALUES_FILTERS } from '../../constants/Order.constant';
 import { IOptionSelect } from '../../../../commons/interfaces/ICommon.interface';
 import { useGetCustomerListQuery } from '../../redux/Orders.api';
 
