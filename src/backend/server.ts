@@ -1,7 +1,7 @@
 import app from './app';
 import { serve } from 'bun';
 
-const port = 4000;
+const port = Number(process.env.PORT) || 4000;
 
 serve({
   port,

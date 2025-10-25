@@ -88,8 +88,6 @@ jobs:
     needs: [validate, sync-database]
     if: always() && needs.validate.result == 'success' && (needs.sync-database.result == 'success' || needs.sync-database.result == 'skipped')
     environment: homologation
-    env:
-      NODE_ENV: 'homologation'
     
     steps:
       # 1. Checkout da branch especificada
@@ -118,7 +116,7 @@ jobs:
           REACT_APP_API_URL: https://hml.pedidosnicolina.com
           REACT_APP_FRONTEND_URL: https://hml.pedidosnicolina.com
           CI: false
-        run: NODE_ENV=homologation npm run build
+        run: npm run build
 
       # 5. Criar arquivo compactado
       - name: 📦 Create build archive
@@ -161,6 +159,14 @@ jobs:
             
             mkdir -p build
             tar -xzf build-hml.tar.gz -C build/
+            
+            echo "🔍 Verificando extração:"
+            ls -lah build/ | head -20
+            echo ""
+            echo "📄 Verificando index.html:"
+            ls -lh build/index.html
+            stat build/index.html
+            
             rm build-hml.tar.gz
             
             echo "🔧 Atualizando código backend..."
@@ -185,7 +191,6 @@ jobs:
             DB_PASSWORD=${{ secrets.HML_DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.HML_DATABASE_NAME }}
             DATABASE_URL=${{ secrets.HML_DATABASE_URL }}
-            REACT_APP_FRONTEND_URL=${{ secrets.REACT_APP_FRONTEND_URL_HML }}
             PORT=4001
             NODE_ENV=homologation
             EOF
@@ -220,7 +225,6 @@ jobs:
             export DB_NAME
             export NODE_ENV
             export PORT
-            export REACT_APP_FRONTEND_URL
             cd /home/ubuntu/projects/ordermanagerhml/order-manager-hml/src/backend
             exec bun run server.ts
             EOFSCRIPT
