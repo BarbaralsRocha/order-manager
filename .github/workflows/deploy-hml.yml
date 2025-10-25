@@ -157,13 +157,27 @@ jobs:
               mv build build.backup.$(date +%Y%m%d_%H%M%S)
             fi
             
+            echo "📂 Criando pasta build..."
             mkdir -p build
+            
+            echo "📥 Extraindo arquivos..."
             tar -xzf build-hml.tar.gz -C build/
             
             echo "🔍 Verificando extração:"
             ls -lah build/ | head -20
             echo ""
-            echo "📄 Verificando index.html:"
+            echo "📊 Total de arquivos extraídos:"
+            find build -type f | wc -l
+            echo ""
+            
+            if [ ! -f "build/index.html" ]; then
+              echo "❌ ERRO: index.html não foi extraído!"
+              echo "Conteúdo do tar.gz:"
+              tar -tzf build-hml.tar.gz | head -20
+              exit 1
+            fi
+            
+            echo "✅ index.html verificado:"
             ls -lh build/index.html
             stat build/index.html
             
