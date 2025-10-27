@@ -16,6 +16,7 @@ const LoginPage: React.FC = () => {
     redirectPath,
     audience: process.env.HML_AUTH0_AUDIENCE,
     audience2: process.env.REACT_APP_AUTH0_AUDIENCE,
+    secret: process.env.REACT_APP_AUTH0_CLIENT_SECRET,
   });
   useEffect(() => {
     if (isAuthenticated) {
