@@ -4,12 +4,6 @@ name: Deploy to Homologation (Manual)
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch para fazer deploy'
-        required: true
-        default: 'develop'
-        type: string
       # sync_database:
       #   description: 'Sincronizar banco de dados da produção?'
       #   required: true
