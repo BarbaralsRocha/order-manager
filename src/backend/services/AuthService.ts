@@ -77,6 +77,7 @@ export class AuthService {
 
       return user;
     } catch (error) {
+      console.log('ENTROU NO ERRO', error);
       if (error instanceof jwt.TokenExpiredError) {
         throw new Error('Token expired');
       }
