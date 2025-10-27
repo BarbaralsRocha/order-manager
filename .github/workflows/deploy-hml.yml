@@ -39,49 +39,61 @@ jobs:
     steps:
       - name: 🔄 Criar cópia do banco de produção
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          DB_PROD: ${{ secrets.DATABASE_NAME }}
+          DB_HML: ${{ secrets.HML_DATABASE_NAME }}
+          DB_USER_PROD: ${{ secrets.DATABASE_USER }}
+          DB_PASS_PROD: ${{ secrets.DATABASE_PASSWORD }}
+          DB_USER_HML: ${{ secrets.HML_DATABASE_USER }}
+          DB_PASS_HML: ${{ secrets.HML_DATABASE_PASSWORD }}
+          DB_HOST: ${{ secrets.HML_DATABASE_HOST }}
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           timeout: 30m
+          envs: DB_PROD,DB_HML,DB_USER_PROD,DB_PASS_PROD,DB_USER_HML,DB_PASS_HML,DB_HOST
           script: |
             set -e
             
             echo "🔐 Sincronizando banco de dados..."
             echo "⚠️  ATENÇÃO: Isso vai SOBRESCREVER o banco de HML!"
             
-            DB_PROD="${{ secrets.DATABASE_NAME }}"
-            DB_HML="${{ secrets.HML_DATABASE_NAME }}"
-            DB_USER="${{ secrets.DATABASE_USER }}"
-            DB_PASS="${{ secrets.DATABASE_PASSWORD }}"
-            
             BACKUP_FILE="/tmp/prod_backup_$(date +%Y%m%d_%H%M%S).sql"
             
             echo "📦 Criando backup do banco de produção..."
-            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_PROD" > "$BACKUP_FILE"
+            echo "   Database: $DB_PROD"
+            echo "   User: $DB_USER_PROD"
+            mysqldump -h "$DB_HOST" -u "$DB_USER_PROD" -p"$DB_PASS_PROD" "$DB_PROD" > "$BACKUP_FILE"
+            
+            if [ ! -f "$BACKUP_FILE" ] || [ ! -s "$BACKUP_FILE" ]; then
+              echo "❌ Erro ao criar backup!"
+              exit 1
+            fi
             
             echo "📊 Tamanho do backup: $(du -h $BACKUP_FILE | cut -f1)"
             
             echo "🗑️  Dropando banco HML se existir..."
-            mysql -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS \`$DB_HML\`;"
+            echo "   Database: $DB_HML"
+            echo "   User: $DB_USER_HML"
+            mysql -h "$DB_HOST" -u "$DB_USER_HML" -p"$DB_PASS_HML" -e "DROP DATABASE IF EXISTS \`$DB_HML\`;"
             
             echo "🆕 Criando banco HML..."
-            mysql -u "$DB_USER" -p"$DB_PASS" -e "CREATE DATABASE \`$DB_HML\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            mysql -h "$DB_HOST" -u "$DB_USER_HML" -p"$DB_PASS_HML" -e "CREATE DATABASE \`$DB_HML\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
             
             echo "📥 Importando dados da produção para HML..."
-            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" < "$BACKUP_FILE"
+            mysql -h "$DB_HOST" -u "$DB_USER_HML" -p"$DB_PASS_HML" "$DB_HML" < "$BACKUP_FILE"
             
             echo "🧹 Limpando backup temporário..."
             rm "$BACKUP_FILE"
             
             echo "✅ Banco HML sincronizado com sucesso!"
             echo "📊 Contando registros..."
-            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" -e "
+            mysql -h "$DB_HOST" -u "$DB_USER_HML" -p"$DB_PASS_HML" "$DB_HML" -e "
               SELECT 
                 (SELECT COUNT(*) FROM Customer) as total_customers,
                 (SELECT COUNT(*) FROM \`Order\`) as total_orders;
             "
-
   deploy:
     name: Build and Deploy to HML
     runs-on: ubuntu-latest
