@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
       ? process.env.REACT_APP_FRONTEND_URL
       : process.env.REACT_APP_FRONTEND_URL_HML;
 
-  console.log({ redirectPath, env: process.env.NODE_ENV });
+  console.log({ redirectPath, audience: process.env.HML_AUTH0_DOMAIN });
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
