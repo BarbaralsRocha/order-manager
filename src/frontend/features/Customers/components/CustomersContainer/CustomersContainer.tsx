@@ -102,7 +102,6 @@ const CustomerContainer: React.FC = () => {
   ) => {
     setFilters((prev) => ({ ...prev, page: newPage + 1 }));
   };
-  console.log(filters, nameFilter);
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -293,15 +292,17 @@ const CustomerContainer: React.FC = () => {
           </AccordionDetails>
         </Accordion>
       ))}
-      <TablePagination
-        component="div"
-        count={currentData?.output.pagination.total || 0}
-        page={filters.page - 1}
-        onPageChange={handleChangePage}
-        rowsPerPage={filters.limit}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Linhas por página"
-      />
+      {currentData && currentData?.output.pagination.total > filters.limit && (
+        <TablePagination
+          component="div"
+          count={currentData?.output.pagination.total || 0}
+          page={filters.page - 1}
+          onPageChange={handleChangePage}
+          rowsPerPage={filters.limit}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Linhas por página"
+        />
+      )}
     </Box>
   );
 };
