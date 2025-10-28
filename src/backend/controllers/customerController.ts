@@ -91,6 +91,7 @@ export const updateCustomer = async (c: Context) => {
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {
+    console.log('ENTROU NO ERRO DO UPDATE CUSTOMER', error);
     if (error instanceof EdgeCasesConflitError) {
       return c.json({ validationResult: error.errors }, 409);
     }
