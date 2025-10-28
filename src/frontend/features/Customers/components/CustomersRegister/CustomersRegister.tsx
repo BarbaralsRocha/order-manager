@@ -99,13 +99,30 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     return IS_EDITING ? editCustomer({ body: values }) : addCustomer(values);
   }, [IS_EDITING, addCustomer, editCustomer, values]);
 
+  const isErrorCustomers =
+    addCustomerMutation.isError || editCustomerMutation.isError;
+
   const validationResult = useMemo(() => {
     if (addCustomerMutation.isError) {
-      return (addCustomerMutation?.error as { data: any })?.data
-        ?.validationResult as { [key: string]: string }[];
+      return (
+        addCustomerMutation.error as {
+          data: any;
+        }
+      )?.data?.validationResult as {
+        [key: string]: string;
+      }[];
+    }
+    if (editCustomerMutation.isError) {
+      return (
+        editCustomerMutation.error as {
+          data: any;
+        }
+      )?.data?.validationResult as {
+        [key: string]: string;
+      }[];
     }
     return null;
-  }, [addCustomerMutation.isError, addCustomerMutation?.error]);
+  }, [addCustomerMutation, editCustomerMutation]);
 
   return (
     <Box
@@ -115,8 +132,8 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
       justifyContent="space-between"
     >
       <Grid container width={600} spacing={2} sx={{ p: 4 }}>
-        <Grid item component="div" lg={12} xl={12} md={12}>
-          {addCustomerMutation.isError && (
+        {isErrorCustomers && (
+          <Grid item component="div" lg={12} xl={12} md={12}>
             <Alert variant="outlined" severity="error">
               Campos com erros não poderão ser salvos.
               <List
@@ -147,8 +164,8 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
                 ))}
               </List>
             </Alert>
-          )}
-        </Grid>
+          </Grid>
+        )}
         <Grid item component="div" lg={12} xl={12} md={12}>
           <TextField
             label="Nome fantasia"

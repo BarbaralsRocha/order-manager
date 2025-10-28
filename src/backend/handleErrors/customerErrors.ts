@@ -1,12 +1,12 @@
 import { ValidationError } from 'yup';
 
-export class DuplicateCnpjError extends Error {
+export class EdgeCasesConflitError extends Error {
   errors: [{ [key: string]: string }];
 
-  constructor(message?: string, key?: string) {
-    super('CNPJ já está cadastrado no sistema');
-    this.name = 'DuplicateCnpjError';
-    this.errors = [{ cnpj: 'CNPJ já está cadastrado no sistema' }];
+  constructor(message: string, key: string, name: string) {
+    super(message);
+    this.name = name;
+    this.errors = [{ [key]: message }];
   }
 }
 
