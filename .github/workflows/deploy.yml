@@ -108,7 +108,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DB_NAME=${{ secrets.DATABASE_NAME }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            PORT=3000
+            PORT=4000
             NODE_ENV=production
             EOF
             
