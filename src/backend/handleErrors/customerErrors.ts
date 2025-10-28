@@ -3,7 +3,7 @@ import { ValidationError } from 'yup';
 export class DuplicateCnpjError extends Error {
   errors: [{ [key: string]: string }];
 
-  constructor() {
+  constructor(message?: string, key?: string) {
     super('CNPJ já está cadastrado no sistema');
     this.name = 'DuplicateCnpjError';
     this.errors = [{ cnpj: 'CNPJ já está cadastrado no sistema' }];

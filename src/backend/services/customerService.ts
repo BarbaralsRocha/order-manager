@@ -24,7 +24,30 @@ export const updateCustomer = async (
   customerId: number,
   customerData: ICustomer,
 ) => {
-  return customerModel.updateCustomer(customerId, customerData);
+  try {
+    const existingCustomer = await customerModel.findByCnpj(customerData.cnpj);
+
+    if (!existingCustomer) {
+      const error: any = new Error('Cliente não encontrado');
+      error.code = 'P2025';
+      throw error;
+    }
+
+    // Se o CNPJ mudou, verificar se já não existe para outro cliente
+    if (customerData.cnpj !== existingCustomer.cnpj) {
+      const customerWithCnpj = await customerModel.findByCnpj(
+        customerData.cnpj,
+      );
+
+      if (customerWithCnpj && customerWithCnpj.id !== customerId) {
+        const error: any = new Error('CNPJ já cadastrado');
+        error.code = 'P2002';
+        error.meta = { target: ['cnpj'] };
+        throw error;
+      }
+    }
+    return customerModel.updateCustomer(customerId, customerData);
+  } catch (error) {}
 };
 
 export const deleteCustomer = async (customerId: number) => {

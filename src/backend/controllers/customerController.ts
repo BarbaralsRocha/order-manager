@@ -95,6 +95,44 @@ export const updateCustomer = async (c: Context) => {
   }
 };
 
+export const updateCustomer = async (c: Context) => {
+  try {
+    const customerId = parseInt(c.req.param('id'), 10);
+    // Verificar se o cliente existe antes de tentar atualizar
+    // const existingCustomer = await CustomerService.findCustomerById(customerId);
+
+    // if (!existingCustomer) {
+    //   const error: any = new Error('Cliente não encontrado');
+    //   error.code = 'P2025';
+    //   throw error;
+    // }
+
+    // // Se o CNPJ mudou, verificar se já não existe para outro cliente
+    // if (customerData.cnpj !== existingCustomer.cnpj) {
+    //   const customerWithCnpj = await customerModel.findCustomerByCnpj(
+    //     customerData.cnpj,
+    //   );
+
+    //   if (customerWithCnpj && customerWithCnpj.id !== customerId) {
+    //     const error: any = new Error('CNPJ já cadastrado');
+    //     error.code = 'P2002';
+    //     error.meta = { target: ['cnpj'] };
+    //     throw error;
+    //   }
+    // }
+
+    const customerData: ICustomer = await c.req.json();
+    const customerUpdated = await CustomerService.updateCustomer(
+      customerId,
+      customerData,
+    );
+
+    return c.json({ output: customerUpdated }, 201);
+  } catch (error) {
+    return handleError(c, error, 'Failed to update customer');
+  }
+};
+
 export const deleteCustomer = async (c: Context) => {
   try {
     const customerId = parseInt(c.req.param('id'), 10);
