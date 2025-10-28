@@ -102,7 +102,6 @@ const CustomerContainer: React.FC = () => {
   ) => {
     setFilters((prev) => ({ ...prev, page: newPage + 1 }));
   };
-  console.log(filters, nameFilter);
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -144,7 +143,7 @@ const CustomerContainer: React.FC = () => {
   return (
     <Box sx={{ p: 3, gap: 3 }}>
       <Typography sx={{ p: 2, paddingLeft: 0, paddingTop: 0 }} variant="h6">
-        Dados dos clientes
+        Filtros
       </Typography>
       <Grid sx={{ marginBottom: 2 }} spacing={2} container>
         <Grid item lg={4} md={4} xs={12}>
@@ -163,8 +162,6 @@ const CustomerContainer: React.FC = () => {
                 variant="outlined"
                 data-testid="cnpj"
                 style={{ width: '100%' }}
-                error={!!filters.cnpj && filters.cnpj.length < 14}
-                helperText="Informe o CNPJ completo"
               />
             )}
           </InputMask>
@@ -190,6 +187,9 @@ const CustomerContainer: React.FC = () => {
           />
         </Grid>
       </Grid>
+      <Typography sx={{ p: 2, paddingLeft: 0, paddingTop: 0 }} variant="h6">
+        Dados dos clientes
+      </Typography>
       {currentData?.output.data?.map((customer) => (
         <Accordion
           key={customer.id}
@@ -293,15 +293,17 @@ const CustomerContainer: React.FC = () => {
           </AccordionDetails>
         </Accordion>
       ))}
-      <TablePagination
-        component="div"
-        count={currentData?.output.pagination.total || 0}
-        page={filters.page - 1}
-        onPageChange={handleChangePage}
-        rowsPerPage={filters.limit}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Linhas por página"
-      />
+      {currentData && currentData?.output.pagination.total > filters.limit && (
+        <TablePagination
+          component="div"
+          count={currentData?.output.pagination.total || 0}
+          page={filters.page - 1}
+          onPageChange={handleChangePage}
+          rowsPerPage={filters.limit}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Linhas por página"
+        />
+      )}
     </Box>
   );
 };

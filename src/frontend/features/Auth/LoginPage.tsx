@@ -12,7 +12,12 @@ const LoginPage: React.FC = () => {
       ? process.env.REACT_APP_FRONTEND_URL
       : process.env.REACT_APP_FRONTEND_URL_HML;
 
-  console.log({ redirectPath, env: process.env.NODE_ENV });
+  console.log({
+    redirectPath,
+    audience: process.env.HML_AUTH0_AUDIENCE,
+    audience2: process.env.REACT_APP_AUTH0_AUDIENCE,
+    secret: process.env.REACT_APP_AUTH0_CLIENT_SECRET,
+  });
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -39,7 +44,7 @@ const LoginPage: React.FC = () => {
           variant="contained"
           sx={{ mt: 3 }}
         >
-          Login teste com Auth0
+          Login com Auth0
         </Button>
       </Box>
     </Container>

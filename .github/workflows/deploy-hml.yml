@@ -4,89 +4,28 @@ name: Deploy to Homologation (Manual)
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch para fazer deploy'
-        required: true
-        default: 'develop'
-        type: string
-      sync_database:
-        description: 'Sincronizar banco de dados da produção?'
-        required: true
-        default: false
-        type: boolean
-      confirm:
-        description: 'Digite "DEPLOY" para confirmar'
-        required: true
-        type: string
+    # inputs:
+    #   branch:
+    #     description: 'Branch para fazer deploy'
+    #     required: true
+    #     default: 'develop'
+    #     type: string
+    #   sync_database:
+    #     description: 'Sincronizar banco de dados da produção?'
+    #     required: true
+    #     default: false
+    #     type: boolean
+    #   confirm:
+    #     description: 'Digite "DEPLOY" para confirmar'
+    #     required: true
+    #     type: string
 
 jobs:
-  validate:
-    name: Validar confirmação
-    runs-on: ubuntu-latest
-    steps:
-      - name: ❌ Verificar confirmação
-        if: github.event.inputs.confirm != 'DEPLOY'
-        run: |
-          echo "❌ Deploy cancelado: você deve digitar 'DEPLOY' para confirmar"
-          exit 1
-
-  sync-database:
-    name: Sincronizar Database (Opcional)
-    runs-on: ubuntu-latest
-    needs: [validate]
-    if: github.event.inputs.sync_database == 'true'
-    steps:
-      - name: 🔄 Criar cópia do banco de produção
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          timeout: 30m
-          script: |
-            set -e
-            
-            echo "🔐 Sincronizando banco de dados..."
-            echo "⚠️  ATENÇÃO: Isso vai SOBRESCREVER o banco de HML!"
-            
-            DB_PROD="${{ secrets.DATABASE_NAME }}"
-            DB_HML="${{ secrets.HML_DATABASE_NAME }}"
-            DB_USER="${{ secrets.DATABASE_USER }}"
-            DB_PASS="${{ secrets.DATABASE_PASSWORD }}"
-            
-            BACKUP_FILE="/tmp/prod_backup_$(date +%Y%m%d_%H%M%S).sql"
-            
-            echo "📦 Criando backup do banco de produção..."
-            mysqldump -u "$DB_USER" -p"$DB_PASS" "$DB_PROD" > "$BACKUP_FILE"
-            
-            echo "📊 Tamanho do backup: $(du -h $BACKUP_FILE | cut -f1)"
-            
-            echo "🗑️  Dropando banco HML se existir..."
-            mysql -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS \`$DB_HML\`;"
-            
-            echo "🆕 Criando banco HML..."
-            mysql -u "$DB_USER" -p"$DB_PASS" -e "CREATE DATABASE \`$DB_HML\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-            
-            echo "📥 Importando dados da produção para HML..."
-            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" < "$BACKUP_FILE"
-            
-            echo "🧹 Limpando backup temporário..."
-            rm "$BACKUP_FILE"
-            
-            echo "✅ Banco HML sincronizado com sucesso!"
-            echo "📊 Contando registros..."
-            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_HML" -e "
-              SELECT 
-                (SELECT COUNT(*) FROM Customer) as total_customers,
-                (SELECT COUNT(*) FROM \`Order\`) as total_orders;
-            "
-
   deploy:
     name: Build and Deploy to HML
     runs-on: ubuntu-latest
-    needs: [validate, sync-database]
-    if: always() && needs.validate.result == 'success' && (needs.sync-database.result == 'success' || needs.sync-database.result == 'skipped')
+    # needs: [validate, sync-database]
+    # if: always() && needs.validate.result == 'success' && (needs.sync-database.result == 'success' || needs.sync-database.result == 'skipped')
     environment: homologation
     
     steps:
