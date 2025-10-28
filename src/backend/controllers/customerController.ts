@@ -5,7 +5,7 @@ import * as CustomerService from '../services/customerService';
 import { Context } from 'hono';
 import { handleError } from '../utils/handleErrors';
 import {
-  DuplicateCnpjError,
+  EdgeCasesConflitError,
   ValidationFormCustomerError,
 } from '../handleErrors/customerErrors';
 
@@ -42,7 +42,7 @@ export const createCustomer = async (c: Context) => {
       const newCustomer = await CustomerService.createCustomer(body);
       return c.json({ output: newCustomer }, 201);
     } catch (error) {
-      if (error instanceof DuplicateCnpjError) {
+      if (error instanceof EdgeCasesConflitError) {
         return c.json({ validationResult: error.errors }, 409);
       }
       if (error instanceof ValidationFormCustomerError) {
@@ -91,6 +91,10 @@ export const updateCustomer = async (c: Context) => {
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {
+    console.log('ENTROU NO ERRO DO UPDATE CUSTOMER', error);
+    if (error instanceof EdgeCasesConflitError) {
+      return c.json({ validationResult: error.errors }, 409);
+    }
     return handleError(c, error, 'Failed to update customer');
   }
 };

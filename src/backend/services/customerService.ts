@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DuplicateCnpjError } from '../handleErrors/customerErrors';
+import { EdgeCasesConflitError } from '../handleErrors/customerErrors';
 import {
   GetCustomersParams,
   ICustomer,
@@ -11,7 +11,11 @@ export const createCustomer = async (customerData: any) => {
   const existingCustomer = await customerModel.findByCnpj(customerData.cnpj);
 
   if (existingCustomer) {
-    throw new DuplicateCnpjError();
+    throw new EdgeCasesConflitError(
+      'CNPJ já está cadastrado no sistema',
+      'cnpj',
+      'DuplicateCnpjError',
+    );
   }
   return customerModel.createCustomer(customerData);
 };
@@ -24,6 +28,16 @@ export const updateCustomer = async (
   customerId: number,
   customerData: ICustomer,
 ) => {
+  const customerWithCnpj = await customerModel.findByCnpj(customerData.cnpj);
+
+  if (customerWithCnpj && customerWithCnpj.id !== customerId) {
+    throw new EdgeCasesConflitError(
+      'CNPJ já está cadastrado no sistema',
+      'cnpj',
+      'DuplicateCnpjError',
+    );
+  }
+
   return customerModel.updateCustomer(customerId, customerData);
 };
 
