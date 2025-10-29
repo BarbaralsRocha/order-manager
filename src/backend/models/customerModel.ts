@@ -13,6 +13,12 @@ export const findByCnpj = async (cnpj: string) => {
   });
 };
 
+export const findCustomerById = async (customerId: number) => {
+  return prisma.customer.findUnique({
+    where: { id: customerId },
+  });
+};
+
 export const createCustomer = async (customerData: ICustomer) => {
   const newCustomer = await prisma.customer.create({
     data: customerData,
@@ -83,6 +89,16 @@ export const updateCustomer = async (
     where: { id: customerId },
     data: customerData,
   });
+};
+
+export const hasAssociatedOrders = async (
+  customerId: number,
+): Promise<boolean> => {
+  const orderCount = await prisma.order.count({
+    where: { customerId },
+  });
+
+  return orderCount > 0;
 };
 
 export const deleteCustomer = async (customerId: number) => {

@@ -61,8 +61,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
   } = useGetProductsQuery();
   const [sendOrder, sendOrderMutation] = useSendOrderMutation();
   const [editOrder, editOrderMutation] = useEditOrderMutation();
-  const { values, setFieldValue, setFieldTouched, errors } =
-    useFormikContext<IOrder>();
+  const { values, setFieldValue, setFieldTouched } = useFormikContext<IOrder>();
   const { handleCloseDrawer } = useDrawer();
   const { insertRegister, handleRemoveRegister } = useRegister();
   const [listCustomers, setListCustomers] = useState<
@@ -363,7 +362,7 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             sx={{
               color: disableButtonToAddProduct
                 ? 'neutral.light.main'
-                : 'neutral.dark.contrastText',
+                : 'success.main',
               cursor: disableButtonToAddProduct ? 'not-allowed' : 'pointer',
             }}
             onClick={() => {
