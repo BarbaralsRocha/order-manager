@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -36,7 +37,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import useModal from '../../../../commons/hooks/useModal';
 import DeleteConfirmation from '../../../../commons/components/DeleteConfirmation';
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
-import { de } from 'zod/v4/locales';
 import { IFiltersCustomers } from '../../interfaces/FiltersCustomers.interface';
 import { INITIAL_VALUES_CUSTOMER_FILTERS } from '../../constants/InitialValuesCustomerFilters.constant';
 import objetToQueryString from '../../../../../utils/queryString';
@@ -87,7 +87,9 @@ const CustomerContainer: React.FC = () => {
   useAlertHandler({
     apiResult: deleteCustomerMutation,
     successMessage: 'Dados salvos!',
-    errorMessage: 'Não foi possivel salvar os dados!',
+    errorMessage:
+      (deleteCustomerMutation.error as any)?.data?.message ??
+      'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseModal();
       if (refetch) {

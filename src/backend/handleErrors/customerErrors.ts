@@ -10,6 +10,16 @@ export class EdgeCasesConflitError extends Error {
   }
 }
 
+export class EdgeCasesAlertError extends Error {
+  errors: string;
+
+  constructor(message: string, key: string, name: string) {
+    super(message);
+    this.name = name;
+    this.errors = message;
+  }
+}
+
 export class ValidationFormCustomerError extends Error {
   constructor(errors: ValidationError) {
     super('Erro de validação do formulário de cliente');

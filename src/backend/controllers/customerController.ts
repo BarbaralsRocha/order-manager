@@ -5,6 +5,7 @@ import * as CustomerService from '../services/customerService';
 import { Context } from 'hono';
 import { handleError } from '../utils/handleErrors';
 import {
+  EdgeCasesAlertError,
   EdgeCasesConflitError,
   ValidationFormCustomerError,
 } from '../handleErrors/customerErrors';
@@ -84,6 +85,12 @@ export const updateCustomer = async (c: Context) => {
   try {
     const customerId = parseInt(c.req.param('id'), 10);
     const customerData: ICustomer = await c.req.json();
+
+    await createCustomerSchema
+      .validate(await c.req.json<ICustomer>(), { abortEarly: false })
+      .catch((err) => {
+        throw new ValidationFormCustomerError(err);
+      });
     const customerUpdated = await CustomerService.updateCustomer(
       customerId,
       customerData,
@@ -91,9 +98,11 @@ export const updateCustomer = async (c: Context) => {
 
     return c.json({ output: customerUpdated }, 201);
   } catch (error) {
-    console.log('ENTROU NO ERRO DO UPDATE CUSTOMER', error);
     if (error instanceof EdgeCasesConflitError) {
       return c.json({ validationResult: error.errors }, 409);
+    }
+    if (error instanceof ValidationFormCustomerError) {
+      return c.json({ validationResult: error.errors }, 400);
     }
     return handleError(c, error, 'Failed to update customer');
   }
@@ -102,10 +111,14 @@ export const updateCustomer = async (c: Context) => {
 export const deleteCustomer = async (c: Context) => {
   try {
     const customerId = parseInt(c.req.param('id'), 10);
-    const customerUpdated = await CustomerService.deleteCustomer(customerId);
 
-    return c.json({ output: customerUpdated }, 201);
+    await CustomerService.deleteCustomer(customerId);
+
+    return c.body(null, 204);
   } catch (error) {
+    if (error instanceof EdgeCasesAlertError) {
+      return c.json({ message: error.errors }, 400);
+    }
     return handleError(c, error, 'Failed to delete customer');
   }
 };
