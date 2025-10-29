@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import {
   Autocomplete,
@@ -109,6 +109,17 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
     },
     [setFilters],
   );
+
+  const selectProducts = useMemo(() => {
+    const products = filters.products.map((value) => {
+      const findProduct = listProducts?.find(
+        (product) => +product.id === +value,
+      );
+      return findProduct?.value ?? value;
+    });
+    return products;
+  }, [filters.products, listProducts]);
+
   // TODO: FAZER A BUSCA DOS CLIENTES E DOS PRODUTOS NO AUTOCOMPLETE FETCH
   return (
     <Box gap={1}>
@@ -138,7 +149,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Filtrar por cliente"
+                        label="Cliente"
                         value={filters.customerId}
                       />
                     )}
@@ -181,7 +192,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                 <DemoItem sx={{ marginTop: 1 }}>
                   <TimePicker
                     ampm={false}
-                    label="Filtrar por horário"
+                    label="Horário"
                     value={filters.time ? dayjs(filters.time) : null}
                     onChange={(e) => {
                       if (!filters.startDate) {
@@ -203,20 +214,24 @@ const Filters: React.FC<IProps> = ({ filters, setFilters, hasFilter }) => {
                 sx={{ width: '100%' }}
               >
                 <FormControl fullWidth sx={{ marginTop: 1 }}>
-                  <InputLabel>Filtrar por produtos</InputLabel>
+                  <InputLabel>Produtos</InputLabel>
                   <Select
                     multiple
-                    label="Filtrar por produtos"
-                    value={filters.products}
+                    label="Produtos"
+                    value={selectProducts}
                     onChange={handleChangeProducts}
-                    input={<OutlinedInput label="Filtrar por produtos" />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
-                      </Box>
-                    )}
+                    input={<OutlinedInput label="Produtos" />}
+                    renderValue={(selected) => {
+                      return (
+                        <Box
+                          sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                        >
+                          {selected.map((value) => (
+                            <Chip key={value} label={value} />
+                          ))}
+                        </Box>
+                      );
+                    }}
                   >
                     {listProducts?.map((product) => (
                       <MenuItem key={product.value} value={product.id}>
