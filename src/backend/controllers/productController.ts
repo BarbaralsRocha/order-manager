@@ -1,19 +1,80 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-extraneous-dependencies */
 import * as productService from '../services/productService';
 import { Context } from 'hono';
-import { handleError, handleValidation } from '../utils/handleErrors';
+import {
+  handleError,
+  handleValidation,
+  handleNotFound,
+  ValidationFormCustomerError,
+  ValidationFormProductError,
+} from '../utils/handleErrors';
+import validationSchemaProduct from '../schemas/validationSchemaProducts';
+import { IProduct } from '../interfaces/Product.interface';
 
+/**
+ * Listagem de produtos com paginação e filtros
+ */
 export const listProducts = async (ctx: Context) => {
   try {
-    const products = await productService.getAllProducts();
-    return ctx.json({ output: products });
+    const page = parseInt(ctx.req.query('page') || '1', 10);
+    const limit = parseInt(ctx.req.query('limit') || '10', 10);
+    const search = ctx.req.query('search') || '';
+
+    if (page < 1) {
+      return handleValidation(ctx, 'O número da página deve ser maior que 0');
+    }
+
+    const result = await productService.getAllProducts({
+      page,
+      limit,
+      search,
+    });
+
+    return ctx.json({
+      output: result.products,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    });
   } catch (error) {
-    handleError(ctx, error, 'Error list products');
+    return handleError(ctx, error, 'Erro ao listar produtos');
   }
 };
 
+/**
+ * Buscar produto por ID
+ */
+export const getProductById = async (ctx: Context) => {
+  try {
+    const id = ctx.req.param('id');
+    const productId = parseInt(id, 10);
+
+    if (isNaN(productId) || productId < 1) {
+      return handleValidation(ctx, 'ID do produto inválido');
+    }
+
+    const product = await productService.getProductById(productId);
+
+    if (!product) {
+      return handleNotFound(ctx, 'Produto', productId);
+    }
+
+    return ctx.json({ output: product });
+  } catch (error) {
+    return handleError(ctx, error, 'Erro ao buscar produto');
+  }
+};
+
+/**
+ * Criar novo produto
+ */
 export const createProduct = async (c: Context) => {
   try {
+    const body = await c.req.json();
     const {
       name,
       additionalInformation,
@@ -21,70 +82,88 @@ export const createProduct = async (c: Context) => {
       unityPrice,
       unitaryWeight,
       weightPrice,
-    } = await c.req.json();
+    } = body;
 
-    if (!name || !type) {
-      return handleValidation(c, 'Nome e Tipo são obrigatórios');
-    }
-
-    if (type === 'UN' && !unityPrice) {
-      return handleValidation(
-        c,
-        'Preço unitário é obrigatório para produtos do tipo UN',
-      );
-    }
-
-    if (type === 'KG' && !weightPrice) {
-      return handleValidation(
-        c,
-        'Peso unitário e Preço por Quilo são obrigatórios para produtos do tipo KG',
-      );
-    }
-
-    if (type === 'UN_KG' && (!unityPrice || !unitaryWeight || !weightPrice)) {
-      return handleValidation(
-        c,
-        'Preço unitário, Peso unitário e Preço por quilo são obrigatórios para produtos do tipo UN_KG',
-      );
-    }
+    await validationSchemaProduct
+      .validate(body, { abortEarly: false })
+      .catch((err) => {
+        throw new ValidationFormCustomerError(err);
+      });
 
     const newProduct = await productService.createProduct({
-      name,
-      additionalInformation,
+      name: name.trim(),
+      additionalInformation: additionalInformation?.trim() || null,
       type,
-      unityPrice: unityPrice || null,
-      unitaryWeight: unitaryWeight || null,
-      weightPrice: weightPrice || null,
+      unityPrice:
+        type === 'UN' || type === 'UN_KG' ? parseFloat(unityPrice) : null,
+      unitaryWeight: type === 'UN_KG' ? parseFloat(unitaryWeight) : null,
+      weightPrice:
+        type === 'KG' || type === 'UN_KG' ? parseFloat(weightPrice) : null,
     });
 
     return c.json({ output: newProduct }, 201);
   } catch (error) {
-    handleError(c, error, 'Failed to create product');
+    if (error instanceof ValidationFormCustomerError) {
+      return c.json({ validationResult: error.errors }, 400);
+    }
+    return handleError(c, error, 'Erro ao criar produto');
   }
 };
 
+/**
+ * Atualizar produto
+ */
 export const updateProduct = async (c: Context) => {
   try {
-    const productId = parseInt(c.req.param('id'), 10);
-    const productData = await c.req.json();
-    const productUpdated = await productService.updateProduct(
-      productId,
-      productData,
-    );
+    const id = c.req.param('id');
+    const productId = parseInt(id, 10);
+
+    const body = await c.req.json<IProduct>();
+
+    await validationSchemaProduct
+      .validate(body, { abortEarly: false })
+      .catch((err) => {
+        throw new ValidationFormProductError(err);
+      });
+
+    const productUpdated = await productService.updateProduct(productId, body);
 
     return c.json({ output: productUpdated }, 201);
   } catch (error) {
-    handleError(c, error, 'Failed to create product');
+    if (error instanceof ValidationFormProductError) {
+      return c.json({ validationResult: error.errors }, 400);
+    }
+    return handleError(c, error, 'Erro ao atualizar produto');
   }
 };
 
+/**
+ * Deletar produto
+ */
 export const deleteProduct = async (c: Context) => {
   try {
-    const productId = parseInt(c.req.param('id'), 10);
-    const productUpdated = await productService.deleteProduct(productId);
+    const id = c.req.param('id');
+    const productId = parseInt(id, 10);
 
-    return c.json({ output: productUpdated }, 201);
+    if (isNaN(productId) || productId < 1) {
+      return handleValidation(c, 'ID do produto inválido');
+    }
+
+    await productService.deleteProduct(productId);
+
+    return c.body(null, 204);
   } catch (error) {
-    handleError(c, error, 'Failed to create product');
+    if (error instanceof Error) {
+      if (
+        error.message.includes('not found') ||
+        error.message.includes('não encontrado')
+      ) {
+        return handleNotFound(c, 'Produto', c.req.param('id'));
+      }
+      if (error.message.includes('está vinculado a um pedido')) {
+        return handleValidation(c, error.message);
+      }
+    }
+    return handleError(c, error, 'Erro ao deletar produto');
   }
 };

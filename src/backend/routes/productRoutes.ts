@@ -13,6 +13,12 @@ const productRoutes = new Hono();
 productRoutes.get('/products', productController.listProducts);
 
 /**
+ * Buscar um produto específico por ID
+ * @route GET /product/:id
+ */
+productRoutes.get('/product/:id', productController.getProductById);
+
+/**
  * Criar um novo produto
  * @route POST /product
  * Edge Case: Se os dados do produto forem inválidos, retornar erro 400 (Validação do formulário)

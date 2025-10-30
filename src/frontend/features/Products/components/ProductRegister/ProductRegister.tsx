@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   FormControl,
@@ -8,6 +9,7 @@ import {
   Box,
   Divider,
   Button,
+  Grid,
 } from '@mui/material';
 import { useFormikContext } from 'formik';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -28,6 +30,7 @@ import {
 import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../commons/redux/store';
+import AlertregisterValidation from '../../../../commons/components/AlertRegisterValidation';
 dayjs.locale('pt-br');
 
 interface IProps {
@@ -110,6 +113,32 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     return IS_EDITING ? editProduct({ body: values }) : addProduct(values);
   }, [IS_EDITING, addProduct, editProduct, values]);
 
+  const isErrorProducts = useMemo(
+    () => addProductMutation.isError || editProductMutation.isError,
+    [addProductMutation.isError, editProductMutation.isError],
+  );
+  const validationResult = useMemo(() => {
+    if (addProductMutation.isError) {
+      return (
+        addProductMutation.error as {
+          data: any;
+        }
+      )?.data?.validationResult as {
+        [key: string]: string;
+      }[];
+    }
+    if (editProductMutation.isError) {
+      return (
+        editProductMutation.error as {
+          data: any;
+        }
+      )?.data?.validationResult as {
+        [key: string]: string;
+      }[];
+    }
+    return undefined;
+  }, [addProductMutation, editProductMutation]);
+
   return (
     <S.Container>
       <div style={{ paddingTop: 32 }}>
@@ -122,9 +151,15 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
             gap: 2,
           }}
         >
+          {isErrorProducts && (
+            <Grid item component="div" lg={12} xl={12} md={12}>
+              <AlertregisterValidation validationResult={validationResult} />
+            </Grid>
+          )}
           <TextField
             label="Nome do produto"
             variant="outlined"
+            required
             data-testid="name"
             value={values.name || ''}
             onChange={(e) => handleChange('name', e.target.value)}
@@ -135,6 +170,7 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               value={values.type || ''}
               label="Medida"
               data-testid="type"
+              required
               onChange={(e) => {
                 handleChange('type', e.target.value as Measurement);
                 cleanFields(['unityPrice', 'unitaryWeight', 'weightPrice']);
@@ -179,6 +215,8 @@ const ProductRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
               label="Peso unitário"
             />
           )}
+
+          {/* TODO: Atualizar preço a partir de uma data ou por um período */}
           <TextField
             label="Informações adicionais"
             variant="outlined"

@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
   Divider,
   FormControlLabel,
   Grid,
-  List,
-  ListItem,
   TextField,
 } from '@mui/material';
 import { ICustomer } from '../../interfaces/ICustomer';
@@ -24,6 +21,7 @@ import useAlertHandler from '../../../../commons/hooks/useAlertHandler';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../commons/redux/store';
 import * as S from './CustomersRegister.style';
+import AlertregisterValidation from '../../../../commons/components/AlertRegisterValidation';
 
 interface IProps {
   labelButton?: 'Cadastrar' | 'Editar';
@@ -121,7 +119,7 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
         [key: string]: string;
       }[];
     }
-    return null;
+    return undefined;
   }, [addCustomerMutation, editCustomerMutation]);
 
   return (
@@ -134,36 +132,7 @@ const CustomersRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
       <Grid container width={600} spacing={2} sx={{ p: 4 }}>
         {isErrorCustomers && (
           <Grid item component="div" lg={12} xl={12} md={12}>
-            <Alert variant="outlined" severity="error">
-              Campos com erros não poderão ser salvos.
-              <List
-                sx={{
-                  width: '100%',
-                  bgcolor: 'background.paper',
-                  overflow: 'auto',
-                  listStyleType: 'disc',
-                  pl: 3,
-                }}
-                component="ul"
-              >
-                {validationResult?.map((value) => (
-                  <ListItem
-                    component="li"
-                    sx={{ p: 0, display: 'list-item' }}
-                    key={`item-${Object.keys(value)}`}
-                  >
-                    <S.ItemTexto
-                      sx={{
-                        '& .MuiListItemText-primary': {
-                          fontSize: '12px',
-                        },
-                      }}
-                      primary={Object.values(value)}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Alert>
+            <AlertregisterValidation validationResult={validationResult} />
           </Grid>
         )}
         <Grid item component="div" lg={12} xl={12} md={12}>

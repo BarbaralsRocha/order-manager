@@ -26,7 +26,10 @@ const ProductList: React.FC<IProps> = ({ refetch, product }) => {
   useAlertHandler({
     apiResult: deleteProductMutation,
     successMessage: 'Dados salvos!',
-    errorMessage: 'Não foi possivel salvar os dados!',
+    errorMessage:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (deleteProductMutation.error as any)?.data?.error.message ??
+      'Não foi possivel salvar os dados!',
     callback: () => {
       handleCloseModal();
       refetch();

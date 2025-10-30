@@ -4,7 +4,7 @@ export interface IProduct {
   name: string;
   additionalInformation: string;
   type: ProductType;
-  unityPrice: number;
-  unitaryWeight: number;
-  weightPrice: number;
+  unityPrice: number | null;
+  unitaryWeight: number | null;
+  weightPrice: number | null;
 }
