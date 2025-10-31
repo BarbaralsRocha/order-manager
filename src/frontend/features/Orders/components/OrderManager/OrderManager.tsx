@@ -42,11 +42,6 @@ const OrderManager: React.FC<IProps> = ({ query, component }) => {
     apiResult: downloadListMutation,
     successMessage: 'Download realizado com sucesso!',
     errorMessage: 'Não foi possivel fazer o download!',
-    callback: () => {
-      if (refetch) {
-        refetch();
-      }
-    },
   });
 
   return (

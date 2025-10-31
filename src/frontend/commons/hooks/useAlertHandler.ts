@@ -6,7 +6,7 @@ interface IProps {
   apiResult: any;
   successMessage: string;
   errorMessage: string;
-  callback(): void;
+  callback?: () => void;
 }
 
 const useAlertHandler = ({
@@ -27,7 +27,9 @@ const useAlertHandler = ({
         apiResult.data?.output ||
         apiResult.isSuccess
       ) {
-        callback();
+        if (callback) {
+          callback();
+        }
         showSnackbar({ message: successMessage, type: 'success' });
         return;
       } else {

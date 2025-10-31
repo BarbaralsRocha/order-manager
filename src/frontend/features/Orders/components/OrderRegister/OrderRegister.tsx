@@ -169,6 +169,26 @@ const OrderRegister: React.FC<IProps> = ({ labelButton = 'Cadastrar' }) => {
     [products.product?.type],
   );
 
+  const haveOnlyOneUnity = useCallback(() => {
+    if (!products.product?.type) return;
+    if (products.product.type === MeasurementEnum.UN) {
+      setProducts((prev) => ({
+        ...prev,
+        type: MeasurementEnum.UN,
+      }));
+    }
+    if (products.product.type === MeasurementEnum.KG) {
+      setProducts((prev) => ({
+        ...prev,
+        type: MeasurementEnum.KG,
+      }));
+    }
+  }, [products.product?.type]);
+
+  useEffect(() => {
+    haveOnlyOneUnity();
+  }, [haveOnlyOneUnity]);
+
   const findCustomer = useMemo(() => {
     return listCustomers?.find((customer) => customer.id === values.customerId);
   }, [listCustomers, values.customerId]);
